@@ -104,10 +104,12 @@ Dependencies are listed in `package.json`.
 
 **TUBS** — Build4Better 2026
 
-Names recorded in this repository’s history: MTahaFarrukh, UzairAhmed87, and sjameel06.
+- Uzair Ahmed
+- Taha Farrukh
+- Bilal Rasheed
 
 ## Submitted commit
 
-Final submitted commit identifier: `6d5d241369c927a23e04f9aaca515ecabe121fc3`
+Final submitted commit identifier: `PENDING_FINAL_COMMIT`
 
-That commit contains the app and this README. The commit after it only writes this identifier.
+That commit contains the app and this README, including the team above. The commit after it only writes this identifier.
