@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #F8F6F0;
+  --color-forest: #183B35;
+  --color-teal: #167D68;
+  --color-sage: #E7F0E9;
+  --color-ink: #26332F;
+  --color-teal-soft: #D7EDE6;
+  --color-forest-muted: #2A524A;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Lexend", system-ui, sans-serif;
+
+  --shadow-soft: 0 10px 30px rgba(24, 59, 53, 0.08);
+  --shadow-lift: 0 16px 40px rgba(24, 59, 53, 0.12);
+  --radius-card: 1.5rem;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background:
+      radial-gradient(ellipse 80% 50% at 10% -10%, rgba(22, 125, 104, 0.12), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(231, 240, 233, 0.9), transparent 50%),
+      linear-gradient(180deg, #F8F6F0 0%, #F1EEE6 100%);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-teal);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-lift {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .touch-target {
+    min-height: 3.25rem;
+    min-width: 3.25rem;
+  }
+}
