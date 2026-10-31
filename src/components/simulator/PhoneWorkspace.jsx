@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { getContactById, getPhotoById } from '../../data/gallery'
-import { APPS } from '../../hooks/useSimulator'
+import { APPS, PRACTICE_MODES } from '../../hooks/useSimulator'
 import GalleryGrid from './GalleryGrid'
 import HomeScreen from './HomeScreen'
 import PhoneFrame from './PhoneFrame'
@@ -8,7 +8,7 @@ import PhotoPreview from './PhotoPreview'
 import ShareSheet from './ShareSheet'
 import SuccessScreen from './SuccessScreen'
 
-export default function PhoneWorkspace({ simulator }) {
+export default function PhoneWorkspace({ simulator, hideInPhoneSuccess = false }) {
   const {
     state,
     openGallery,
@@ -25,8 +25,14 @@ export default function PhoneWorkspace({ simulator }) {
 
   const photo = getPhotoById(state.selectedPhotoId)
   const recipient = getContactById(state.selectedRecipientId)
+  const showSuccess = state.app === APPS.success && !hideInPhoneSuccess
 
   const handleWrongApp = (label) => {
+    if (state.mode === PRACTICE_MODES.independent) {
+      wrongAction(null)
+      return
+    }
+
     if (state.guidedEnabled && state.guidedStep === 1) {
       wrongAction({
         en: `That was ${label}. For this lesson, open Gallery.`,
@@ -34,6 +40,7 @@ export default function PhoneWorkspace({ simulator }) {
       })
       return
     }
+
     wrongAction({
       en: `${label} is only decorative in practice mode. Try Gallery for this lesson.`,
       ur: `مشق میں ${label} صرف دکھانے کے لیے ہے۔ اس سبق میں Gallery آزمائیں۔`,
@@ -77,13 +84,24 @@ export default function PhoneWorkspace({ simulator }) {
               />
             )}
 
-            {state.app === APPS.success && (
+            {showSuccess && (
               <SuccessScreen
                 photo={photo}
                 recipientName={recipient?.name ?? 'family'}
-                onReset={() => reset(true)}
+                onReset={() => reset(state.mode)}
                 onBackHome={goHome}
               />
+            )}
+
+            {state.app === APPS.success && hideInPhoneSuccess && (
+              <div className="flex h-full flex-col items-center justify-center bg-sage px-6 text-center">
+                <p className="font-display text-2xl font-semibold text-forest">
+                  Opening your results…
+                </p>
+                <p className="mt-2 text-sm text-forest-muted" lang="ur" dir="auto">
+                  نتائج کھل رہے ہیں…
+                </p>
+              </div>
             )}
           </motion.div>
         </AnimatePresence>
@@ -95,6 +113,7 @@ export default function PhoneWorkspace({ simulator }) {
           onConfirm={confirmShare}
           onClose={goBack}
           isHighlighted={isHighlighted}
+          confirmError={state.confirmError}
         />
       </div>
     </PhoneFrame>

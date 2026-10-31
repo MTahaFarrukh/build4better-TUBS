@@ -2,27 +2,40 @@ import { motion } from 'framer-motion'
 import {
   ArrowLeft,
   Clock3,
+  Compass,
   ImagePlus,
   Lock,
+  RotateCcw,
   Sparkles,
 } from 'lucide-react'
 import AppShell from '../components/layout/AppShell'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { COMING_SOON_LESSONS, FLAGSHIP_LESSON } from '../data/lessons'
+import {
+  formatDuration,
+  getProgressLabel,
+  getProgressPercent,
+} from '../data/progress'
 
 export default function DashboardScreen({
   onBack,
-  lessonStarted,
-  lessonCompleted,
-  onStartLesson,
+  progress,
+  onStartGuided,
+  onStartIndependent,
+  onResetProgress,
 }) {
-  const progressPercent = lessonCompleted ? 100 : lessonStarted ? 35 : 0
-  const progressLabel = lessonCompleted
-    ? '100% — practice completed'
-    : lessonStarted
-      ? '35% — practice started'
-      : '0% — ready to begin'
+  const progressPercent = getProgressPercent(progress)
+  const progressLabel = getProgressLabel(progress)
+  const latest = progress?.latestIndependentResult
+  const latestDuration = formatDuration(latest?.durationMs)
+
+  const handleResetProgress = () => {
+    const confirmed = window.confirm(
+      'Reset saved practice progress on this device? This does not affect Guided or Independent lesson content.',
+    )
+    if (confirmed) onResetProgress?.()
+  }
 
   return (
     <AppShell onBrandClick={onBack}>
@@ -40,7 +53,10 @@ export default function DashboardScreen({
             Your learning space
           </h1>
           <p className="mt-2 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-            Begin with one practical lesson on a safe practice phone.
+            Learn with guidance first, then try Independent Practice on the same safe phone.
+          </p>
+          <p className="mt-1 text-base text-forest-muted" lang="ur" dir="auto">
+            پہلے رہنمائی کے ساتھ سیکھیں، پھر خود مشق کریں۔
           </p>
         </div>
       </div>
@@ -94,17 +110,20 @@ export default function DashboardScreen({
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button onClick={onStartLesson} className="w-full sm:w-fit">
+                  <Button onClick={onStartGuided} className="w-full sm:w-fit">
                     <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                    {lessonCompleted
-                      ? 'Practice again'
-                      : lessonStarted
-                        ? 'Continue practice'
-                        : 'Start guided practice'}
+                    {progress.guidedCompleted ? 'Replay guided practice' : 'Start guided practice'}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={onStartIndependent}
+                    className="w-full sm:w-fit"
+                  >
+                    <Compass className="h-5 w-5" aria-hidden="true" />
+                    Independent Practice
                   </Button>
                   <p className="text-sm text-forest-muted">
-                    Opens a practice smartphone with Gallery, Share, and gentle Urdu + English guidance.
-                    Nothing real is sent.
+                    Guided mode shows Urdu + English steps. Independent mode hides the guide so you can practise freely. Nothing real is sent.
                   </p>
                 </div>
               </div>
@@ -121,11 +140,13 @@ export default function DashboardScreen({
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Your progress</h2>
             <p className="mt-2 text-sm leading-relaxed text-ink/75">
-              {lessonCompleted
-                ? 'You finished the photo-sharing practice. You can repeat it anytime.'
-                : lessonStarted
-                  ? 'You started the photo-sharing practice. Continue whenever you like.'
-                  : 'No lessons started yet. Open the flagship lesson when you feel ready.'}
+              {progress.independentCompleted
+                ? 'You completed Independent Practice. You can replay either mode anytime.'
+                : progress.guidedCompleted
+                  ? 'Guided practice is done. Try Independent Practice when you feel ready.'
+                  : progress.shareFamilyPhotoStarted
+                    ? 'You started the photo-sharing lesson. Continue whenever you like.'
+                    : 'No lessons completed yet. Start with Guided Practice.'}
             </p>
             <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage">
               <div
@@ -135,9 +156,39 @@ export default function DashboardScreen({
               />
             </div>
             <p className="mt-2 text-xs font-medium tracking-wide text-forest-muted uppercase">
-              {progressLabel}
+              {progressPercent}% — {progressLabel}
             </p>
+
+            <button
+              type="button"
+              onClick={handleResetProgress}
+              className="mt-5 inline-flex items-center gap-2 rounded-xl text-sm font-medium text-forest-muted transition-colors hover:text-forest"
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Reset saved progress
+            </button>
           </Card>
+
+          {latest?.completed && (
+            <Card className="p-6">
+              <h2 className="font-display text-xl font-semibold text-forest">
+                Latest independent result
+              </h2>
+              <ul className="mt-4 space-y-2 text-sm text-ink/85">
+                <li>Successful taps: {latest.successfulActions}</li>
+                <li>Extra tries: {latest.incorrectAttempts}</li>
+                <li>Time: {latestDuration ?? 'Not recorded'}</li>
+                <li>
+                  {latest.completedWithoutAssistance
+                    ? 'Finished without guided help'
+                    : 'Completed with assistance'}
+                </li>
+              </ul>
+              <p className="mt-3 text-sm text-forest-muted" lang="ur" dir="auto">
+                آخری خود مشق کا نتیجہ اسی آلے پر محفوظ ہے۔
+              </p>
+            </Card>
+          )}
 
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Coming soon</h2>

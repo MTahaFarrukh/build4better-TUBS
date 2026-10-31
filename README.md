@@ -2,7 +2,7 @@
 
 Interactive, accessible smartphone practice for Pakistani parents and grandparents — built by **Team TUBS** for Build4Better 2026.
 
-## Current features (Phase 1 + 2)
+## Current features (Phase 1–3)
 
 - React + Vite + Tailwind CSS foundation
 - Global design system and application shell
@@ -12,6 +12,8 @@ Interactive, accessible smartphone practice for Pakistani parents and grandparen
 - Practice Gallery with fictional illustrated photos
 - Share sheet with fictional family contacts
 - Guided learning overlay (English + Urdu)
+- Independent Practice mode (no guide overlays)
+- Results screen with transparent practice metrics
 - LocalStorage for view preference and lesson progress
 
 ## Run locally

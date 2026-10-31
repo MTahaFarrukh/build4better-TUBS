@@ -11,6 +11,7 @@ export default function ShareSheet({
   onConfirm,
   onClose,
   isHighlighted,
+  confirmError = null,
 }) {
   useEffect(() => {
     if (!open) return undefined
@@ -103,6 +104,19 @@ export default function ShareSheet({
                 })}
               </ul>
             </GuideHighlight>
+
+            {confirmError && (
+              <div
+                className="mt-4 rounded-2xl bg-teal-soft/90 px-4 py-3"
+                role="status"
+                aria-live="polite"
+              >
+                <p className="text-sm text-forest">{confirmError.en}</p>
+                <p className="mt-1 text-sm text-forest" lang="ur" dir="auto">
+                  {confirmError.ur}
+                </p>
+              </div>
+            )}
 
             <div className="mt-5">
               <GuideHighlight active={isHighlighted('confirm-share')} className="rounded-2xl">

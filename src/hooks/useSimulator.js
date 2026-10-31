@@ -9,30 +9,58 @@ export const APPS = {
   success: 'success',
 }
 
-export const initialSimulatorState = {
-  app: APPS.home,
-  selectedPhotoId: null,
-  selectedRecipientId: null,
-  shareConfirmed: false,
-  guidedEnabled: true,
-  guidedStep: 1,
-  maxReachedStep: 1,
-  guidedComplete: false,
-  hint: null,
-  celebration: false,
+export const PRACTICE_MODES = {
+  guided: 'guided',
+  independent: 'independent',
 }
+
+function createInitialState(mode = PRACTICE_MODES.guided) {
+  const independent = mode === PRACTICE_MODES.independent
+  return {
+    mode,
+    app: APPS.home,
+    selectedPhotoId: null,
+    selectedRecipientId: null,
+    shareConfirmed: false,
+    guidedEnabled: !independent,
+    guidedStep: 1,
+    maxReachedStep: 1,
+    guidedComplete: false,
+    hint: null,
+    confirmError: null,
+    celebration: false,
+    startedAt: Date.now(),
+    incorrectAttempts: 0,
+    successfulActions: 0,
+    completedStepIds: [],
+    resultSummary: null,
+  }
+}
+
+export const initialSimulatorState = createInitialState(PRACTICE_MODES.guided)
 
 function buildHint(messageEn, messageUr) {
   return { en: messageEn, ur: messageUr }
 }
 
+function markStep(stepIds, stepId) {
+  if (stepIds.includes(stepId)) return stepIds
+  return [...stepIds, stepId]
+}
+
+function bumpSuccess(state, stepId) {
+  return {
+    successfulActions: state.successfulActions + 1,
+    completedStepIds: stepId
+      ? markStep(state.completedStepIds, stepId)
+      : state.completedStepIds,
+  }
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case 'RESET':
-      return {
-        ...initialSimulatorState,
-        guidedEnabled: action.guidedEnabled ?? true,
-      }
+      return createInitialState(action.mode ?? state.mode)
 
     case 'EXIT_GUIDED':
       return {
@@ -54,8 +82,10 @@ function reducer(state, action) {
         ...state,
         app: APPS.gallery,
         hint: null,
+        confirmError: null,
         guidedStep,
         maxReachedStep: Math.max(state.maxReachedStep, guidedStep),
+        ...bumpSuccess(state, 'open-gallery'),
       }
     }
 
@@ -67,8 +97,10 @@ function reducer(state, action) {
         selectedPhotoId: action.photoId,
         app: APPS.preview,
         hint: null,
+        confirmError: null,
         guidedStep,
         maxReachedStep: Math.max(state.maxReachedStep, guidedStep),
+        ...bumpSuccess(state, 'select-photo'),
       }
     }
 
@@ -76,10 +108,14 @@ function reducer(state, action) {
       if (!state.selectedPhotoId) {
         return {
           ...state,
-          hint: buildHint(
-            'Select a photo first, then tap Share.',
-            'پہلے تصویر منتخب کریں، پھر Share دبائیں۔',
-          ),
+          incorrectAttempts: state.incorrectAttempts + 1,
+          hint:
+            state.mode === PRACTICE_MODES.independent
+              ? null
+              : buildHint(
+                  'Select a photo first, then tap Share.',
+                  'پہلے تصویر منتخب کریں، پھر Share دبائیں۔',
+                ),
         }
       }
       const advancing = state.guidedEnabled && state.guidedStep === 3
@@ -88,8 +124,10 @@ function reducer(state, action) {
         ...state,
         app: APPS.share,
         hint: null,
+        confirmError: null,
         guidedStep,
         maxReachedStep: Math.max(state.maxReachedStep, guidedStep),
+        ...bumpSuccess(state, 'open-share'),
       }
     }
 
@@ -100,8 +138,10 @@ function reducer(state, action) {
         ...state,
         selectedRecipientId: action.recipientId,
         hint: null,
+        confirmError: null,
         guidedStep,
         maxReachedStep: Math.max(state.maxReachedStep, guidedStep),
+        ...bumpSuccess(state, 'choose-contact'),
       }
     }
 
@@ -109,34 +149,69 @@ function reducer(state, action) {
       if (!state.selectedRecipientId) {
         return {
           ...state,
-          hint: buildHint(
+          incorrectAttempts: state.incorrectAttempts + 1,
+          confirmError: buildHint(
             'Please choose someone first — Ammi, Abu, Beti, or Family Group.',
             'پہلے کسی کو منتخب کریں — امی، ابو، بیٹی، یا Family Group۔',
           ),
+          hint:
+            state.mode === PRACTICE_MODES.independent
+              ? null
+              : buildHint(
+                  'Please choose someone first — Ammi, Abu, Beti, or Family Group.',
+                  'پہلے کسی کو منتخب کریں — امی، ابو، بیٹی، یا Family Group۔',
+                ),
         }
       }
 
+      const finishedAt = Date.now()
+      const successPatch = bumpSuccess(state, 'confirm')
+      const completedStepIds = markStep(
+        markStep(
+          markStep(successPatch.completedStepIds, 'select-photo'),
+          'open-share',
+        ),
+        'choose-contact',
+      )
+
       return {
         ...state,
+        ...successPatch,
+        completedStepIds,
         shareConfirmed: true,
         app: APPS.success,
         celebration: true,
         hint: null,
-        guidedComplete: true,
+        confirmError: null,
+        guidedComplete: state.mode === PRACTICE_MODES.guided,
         guidedEnabled: false,
         guidedStep: TOTAL_GUIDED_STEPS,
         maxReachedStep: TOTAL_GUIDED_STEPS,
+        resultSummary: {
+          completed: true,
+          incorrectAttempts: state.incorrectAttempts,
+          successfulActions: successPatch.successfulActions,
+          durationMs:
+            typeof state.startedAt === 'number'
+              ? Math.max(0, finishedAt - state.startedAt)
+              : null,
+          completedWithoutAssistance: state.mode === PRACTICE_MODES.independent,
+          completedSteps: ['select-photo', 'open-share', 'choose-contact', 'confirm'],
+          finishedAt: new Date(finishedAt).toISOString(),
+        },
       }
     }
 
     case 'WRONG_ACTION':
       return {
         ...state,
-        hint: action.hint,
+        incorrectAttempts: state.incorrectAttempts + 1,
+        hint:
+          state.mode === PRACTICE_MODES.independent ? null : action.hint,
       }
 
     case 'CLEAR_HINT':
-      return { ...state, hint: null }
+      return { ...state, hint: null, confirmError: null }
 
     case 'GO_HOME':
       return {
@@ -147,11 +222,12 @@ function reducer(state, action) {
         shareConfirmed: false,
         celebration: false,
         hint: null,
+        confirmError: null,
       }
 
     case 'BACK': {
       if (state.app === APPS.share) {
-        return { ...state, app: APPS.preview, hint: null }
+        return { ...state, app: APPS.preview, hint: null, confirmError: null }
       }
       if (state.app === APPS.preview) {
         return {
@@ -159,6 +235,7 @@ function reducer(state, action) {
           app: APPS.gallery,
           selectedPhotoId: null,
           hint: null,
+          confirmError: null,
         }
       }
       if (state.app === APPS.gallery || state.app === APPS.success) {
@@ -170,6 +247,7 @@ function reducer(state, action) {
           shareConfirmed: false,
           celebration: false,
           hint: null,
+          confirmError: null,
         }
       }
       return state
@@ -180,15 +258,12 @@ function reducer(state, action) {
   }
 }
 
-export function useSimulator(startGuided = true) {
-  const [state, dispatch] = useReducer(reducer, {
-    ...initialSimulatorState,
-    guidedEnabled: startGuided,
-  })
+export function useSimulator(mode = PRACTICE_MODES.guided) {
+  const [state, dispatch] = useReducer(reducer, mode, createInitialState)
 
-  const reset = useCallback((guidedEnabled = true) => {
-    dispatch({ type: 'RESET', guidedEnabled })
-  }, [])
+  const reset = useCallback((nextMode = mode) => {
+    dispatch({ type: 'RESET', mode: nextMode })
+  }, [mode])
 
   const openGallery = useCallback(() => {
     dispatch({ type: 'OPEN_GALLERY' })
@@ -235,14 +310,18 @@ export function useSimulator(startGuided = true) {
   }, [])
 
   const isHighlighted = useCallback(
-    (target) => state.guidedEnabled && !state.guidedComplete && (
-      (state.guidedStep === 1 && target === 'gallery-app') ||
-      (state.guidedStep === 2 && target === 'photo-grid') ||
-      (state.guidedStep === 3 && target === 'share-button') ||
-      (state.guidedStep === 4 && target === 'recipient-list') ||
-      (state.guidedStep === 5 && target === 'confirm-share')
-    ),
-    [state.guidedEnabled, state.guidedComplete, state.guidedStep],
+    (target) =>
+      state.mode === PRACTICE_MODES.guided &&
+      state.guidedEnabled &&
+      !state.guidedComplete &&
+      (
+        (state.guidedStep === 1 && target === 'gallery-app') ||
+        (state.guidedStep === 2 && target === 'photo-grid') ||
+        (state.guidedStep === 3 && target === 'share-button') ||
+        (state.guidedStep === 4 && target === 'recipient-list') ||
+        (state.guidedStep === 5 && target === 'confirm-share')
+      ),
+    [state.mode, state.guidedEnabled, state.guidedComplete, state.guidedStep],
   )
 
   return {
