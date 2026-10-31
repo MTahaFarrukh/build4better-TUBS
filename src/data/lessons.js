@@ -13,17 +13,4 @@ export const FLAGSHIP_LESSON = {
   ],
 }
 
-export const COMING_SOON_LESSONS = [
-  {
-    id: 'make-video-call',
-    title: 'Make a video call',
-    description: 'Coming in a later update.',
-    status: 'coming-soon',
-  },
-  {
-    id: 'read-news-safely',
-    title: 'Spot a suspicious link',
-    description: 'Coming in a later update.',
-    status: 'coming-soon',
-  },
-]
+export const COMING_SOON_LESSONS = []

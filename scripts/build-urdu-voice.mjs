@@ -5,6 +5,8 @@ import path from 'node:path'
 import { INTERACTIVE_LESSONS } from '../src/data/interactiveLessons.js'
 import { scamScenarios } from '../src/data/scamScenarios.js'
 import { WHATSAPP_VOICE_MESSAGE_LESSON } from '../src/data/followAlong/whatsappVoiceMessage.js'
+import { CHOICE_LESSONS } from '../src/data/choiceLessons.js'
+import { PHONE_TASKS } from '../src/data/phoneTasks.js'
 import { voiceKey } from '../src/data/voiceKey.js'
 
 const execFileAsync = promisify(execFile)
@@ -47,6 +49,8 @@ const lines = new Set(extra)
 walk(INTERACTIVE_LESSONS, lines)
 walk(scamScenarios, lines)
 walk(WHATSAPP_VOICE_MESSAGE_LESSON, lines)
+walk(CHOICE_LESSONS, lines)
+walk(PHONE_TASKS, lines)
 
 await mkdir(outDir, { recursive: true })
 

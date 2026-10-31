@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import {
   ArrowLeft, Award, BookOpen, Camera, Check, ChevronRight, Flame, Gamepad2,
-  LockKeyhole, Mic2, Play, RotateCcw, ShieldCheck, Sparkles, Star, Target,
-  Trophy, Zap,
+  Link2, MessageSquare, Mic2, Phone, Play, RotateCcw, ShieldCheck, Sparkles, Star, Target,
+  Trophy, Video, Wallet, Zap,
 } from 'lucide-react'
 import Language from '../components/journey/Language'
 import ThemeToggle from '../components/journey/ThemeToggle'
@@ -14,7 +14,12 @@ import { STAGE_SIZE, totalPoints } from '../data/progress'
 const activities = [
   { id: 'share-family-photo', icon: Camera, color: 'cyan', title: 'Share a family photo', ur: 'گھر والوں کو تصویر بھیجیں', text: 'Open Gallery, pick a photo, share it with Ammi', textUr: 'گیلری کھولیں، تصویر چنیں، امی کو بھیجیں', points: 100, badge: 'Photo', badgeUr: 'تصویر' },
   { id: 'whatsapp-voice-message', icon: Mic2, color: 'violet', title: 'Send a voice message', ur: 'آواز کا پیغام بھیجیں', text: 'Hold the mic and send a WhatsApp voice note', textUr: 'مائیک دبا کر واٹس ایپ پر آواز بھیجیں', points: 120, badge: 'Voice', badgeUr: 'آواز' },
+  { id: 'one-line-reply', icon: MessageSquare, color: 'green', title: 'Send a short reply', ur: 'مختصر جواب بھیجیں', text: 'Open Ammi’s chat and send “جی، ٹھیک ہے”', textUr: 'امی کی چیٹ کھول کر «جی، ٹھیک ہے» بھیجیں', points: 100, badge: 'Reply', badgeUr: 'جواب' },
+  { id: 'video-call-home', icon: Video, color: 'blue', title: 'Make a video call', ur: 'ویڈیو کال کریں', text: 'Call Beti, see her face, then hang up', textUr: 'بیٹی کو کال کریں، چہرہ دیکھیں، پھر بند کریں', points: 120, badge: 'Call', badgeUr: 'کال' },
   { id: 'scam-safety', icon: ShieldCheck, color: 'orange', title: 'Spot a fake message', ur: 'جعلی پیغام پہچانیں', text: 'Learn to pause, check and stay safe', textUr: 'رکنا، جانچنا اور محفوظ رہنا سیکھیں', points: 150, badge: 'Safety', badgeUr: 'حفاظت' },
+  { id: 'call-saved-number', icon: Phone, color: 'rose', title: 'Call the saved number', ur: 'محفوظ نمبر پر کال کریں', text: 'If a new number asks for money, call the saved one', textUr: 'نیا نمبر پیسے مانگے تو محفوظ نمبر پر کال کریں', points: 130, badge: 'Saved', badgeUr: 'محفوظ' },
+  { id: 'spot-suspicious-link', icon: Link2, color: 'blue', title: 'Leave a suspicious link', ur: 'مشکوک لنک چھوڑ دیں', text: 'Do not open a link that arrives in a message', textUr: 'پیغام میں آیا لنک نہ کھولیں', points: 130, badge: 'Link', badgeUr: 'لنک' },
+  { id: 'pay-bill-safely', icon: Wallet, color: 'green', title: 'Pay a bill safely', ur: 'محفوظ طریقے سے بل ادا کریں', text: 'Check the name and amount. Never share the PIN', textUr: 'نام اور رقم دیکھیں۔ پن کوڈ کسی کو نہ دیں', points: 140, badge: 'Bill', badgeUr: 'بل' },
 ]
 
 const toUrduDigits = (value) => String(value).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d])
@@ -56,7 +61,7 @@ export default function DashboardScreen({ progress, onStartLesson, onBack, onRes
             <div className="player-copy">
               <p>{t('WELCOME BACK', 'خوش آمدید')}</p>
               <h1>{allMastered
-                ? t('You can do all three on your own!', 'آپ تینوں کام خود کر سکتے ہیں!')
+                ? t('You can do every lesson on your own!', 'آپ یہ سارے کام خود کر سکتے ہیں!')
                 : t('Ready to learn something new today?', 'آج کچھ نیا سیکھنے کے لیے تیار ہیں؟')}</h1>
               <div className="level-bar" role="progressbar" aria-valuemin={0} aria-valuemax={STAGE_SIZE} aria-valuenow={stageProgress}><i style={{ width: `${Math.max(points ? 8 : 0, (stageProgress / STAGE_SIZE) * 100)}%` }} /></div>
               <small>{points
@@ -69,7 +74,7 @@ export default function DashboardScreen({ progress, onStartLesson, onBack, onRes
 
           <section className="section-heading">
             <div><span><Sparkles size={14} /> {t('YOUR LEARNING PATH', 'آپ کا سیکھنے کا راستہ')}</span><h2>{t('Choose what to practise', 'کیا مشق کرنی ہے، چنیں')}</h2></div>
-            <span className="mission-count">{n(mastered.length)}/{n(3)} {t('learned', 'سیکھ لیے')}</span>
+            <span className="mission-count">{n(mastered.length)}/{n(activities.length)} {t('learned', 'سیکھ لیے')}</span>
           </section>
 
           <section className="skill-path" aria-label={t('Lessons', 'اسباق')}>
@@ -112,12 +117,6 @@ export default function DashboardScreen({ progress, onStartLesson, onBack, onRes
                 </motion.article>
               )
             })}
-            <div className="skill-node locked" aria-disabled="true">
-              <div className="node-orb"><LockKeyhole size={24} /></div>
-              <div className="mission-card">
-                <div><span className="mission-label">{t('COMING SOON · NOT YET AVAILABLE', 'جلد آئے گا · ابھی دستیاب نہیں')}</span><h3>{t('Pay a bill safely', 'محفوظ طریقے سے بل ادا کریں')}</h3><p>{t('A future lesson. Finish the three above first.', 'آئندہ سبق۔ پہلے اوپر کے تین مکمل کریں۔')}</p></div>
-              </div>
-            </div>
           </section>
         </div>
 
@@ -132,7 +131,7 @@ export default function DashboardScreen({ progress, onStartLesson, onBack, onRes
           </section>
 
           <section className="badges-card">
-            <div className="side-title"><span><Award size={20} /> {t('My badges', 'میرے بیج')}</span><small>{n(mastered.length)}/{n(3)}</small></div>
+            <div className="side-title"><span><Award size={20} /> {t('My badges', 'میرے بیج')}</span><small>{n(mastered.length)}/{n(activities.length)}</small></div>
             <div className="badge-grid">
               {activities.map((activity) => {
                 const Icon = activity.icon

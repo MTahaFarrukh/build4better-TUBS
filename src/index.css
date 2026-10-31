@@ -417,6 +417,9 @@ button:disabled { cursor: default; opacity: .65; }
 .skill-node.cyan .node-orb { color: #6ee7ff; background: #123d55; box-shadow: 0 0 0 2px #1c6f8a, 0 0 25px rgba(53,217,255,.15); }
 .skill-node.violet .node-orb { color: #bca8ff; background: #34236c; box-shadow: 0 0 0 2px #6348bd, 0 0 25px rgba(124,92,255,.15); }
 .skill-node.orange .node-orb { color: #ffc08e; background: #57301e; box-shadow: 0 0 0 2px #9a5932, 0 0 25px rgba(255,138,76,.15); }
+.skill-node.green .node-orb { color: #8ef0c2; background: #124233; box-shadow: 0 0 0 2px #1f7a52, 0 0 25px rgba(46,196,130,.15); }
+.skill-node.blue .node-orb { color: #9ec5ff; background: #1a2f55; box-shadow: 0 0 0 2px #2f5ea8, 0 0 25px rgba(80,140,255,.15); }
+.skill-node.rose .node-orb { color: #ffb3c7; background: #5a2438; box-shadow: 0 0 0 2px #a24b68, 0 0 25px rgba(255,120,160,.15); }
 .skill-node.completed .node-orb { color: #62f0bd; background: #154b3c; box-shadow: 0 0 0 2px #2d9875; }
 .mission-card {
   min-height: 117px; padding: 20px 21px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
@@ -432,6 +435,7 @@ html:not([data-theme=easy]) .skill-node:not(.locked) .mission-card:hover p,
 html:not([data-theme=easy]) .skill-node:not(.locked) .mission-card:hover .mission-reward { color: #dce1f6; }
 .mission-label { color: #777f9e; font-size: 9px; font-weight: 850; letter-spacing: .12em; }
 .skill-node.cyan .mission-label { color: #4fd9f5; }.skill-node.violet .mission-label { color: #9f88ff; }.skill-node.orange .mission-label { color: #ff9b65; }
+.skill-node.green .mission-label { color: #3dce8c; }.skill-node.blue .mission-label { color: #7eb0ff; }.skill-node.rose .mission-label { color: #ff8aab; }
 .mission-card h3 { margin: 5px 0 4px; font-size: 19px; letter-spacing: -.02em; }
 .mission-card p { margin: 0; color: #8d95b5; font-size: 12px; }
 .mission-reward { margin-top: 9px; display: flex; align-items: center; gap: 5px; color: #a5abc5; font-size: 10px; }
@@ -455,7 +459,7 @@ html:not([data-theme=easy]) .skill-node:not(.locked) .mission-card:hover .missio
 .daily-quest-card h3 { margin: 0; text-align: center; font-size: 18px; }.daily-quest-card p { margin: 6px 0 17px; color: #9299b7; text-align: center; font-size: 11px; line-height: 1.55; }
 .daily-progress { height: 6px; overflow: hidden; border-radius: 10px; background: rgba(255,255,255,.09); }.daily-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#7758ed,#4ddcfa); }
 .daily-quest-card > small { display: block; margin-top: 7px; color: #8188a6; text-align: center; font-size: 9px; }
-.badge-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 15px; }
+.badge-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 15px; }
 .badge { height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px dashed #363b59; border-radius: 13px; color: #555b78; background: rgba(255,255,255,.025); }
 .badge.unlocked { color: #ffd25c; border: 1px solid rgba(255,207,83,.25); background: rgba(255,201,73,.08); }
 .badge small { max-width: 65px; overflow: hidden; color: #777e9c; font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }
@@ -648,6 +652,7 @@ html:not([data-theme=easy]) .completion-facts { border-color: rgba(255,255,255,.
 [data-theme=easy] .skill-node.active .mission-card p,
 [data-theme=easy] .skill-node.active .mission-card .mission-reward { color: #2a3358; }
 [data-theme=easy] .skill-node.cyan .mission-label { color: #0b7f9a; } [data-theme=easy] .skill-node.violet .mission-label { color: #5a3ee0; } [data-theme=easy] .skill-node.orange .mission-label { color: #c2561a; }
+[data-theme=easy] .skill-node.green .mission-label { color: #0d7a45; } [data-theme=easy] .skill-node.blue .mission-label { color: #1d4e9c; } [data-theme=easy] .skill-node.rose .mission-label { color: #a1264d; }
 [data-theme=easy] .node-orb { border-color: #f7f8fc; }
 [data-theme=easy] .path-line, [data-theme=easy] .level-bar, [data-theme=easy] .daily-progress, [data-theme=easy] .quest-progress i, [data-theme=easy] .confidence-dots i { background: #e1e5f2; }
 [data-theme=easy] .player-avatar i { border-color: #fff; }

@@ -1,7 +1,12 @@
 export const LESSON_POINTS = {
   'share-family-photo': 100,
   'whatsapp-voice-message': 120,
+  'one-line-reply': 100,
+  'video-call-home': 120,
   'scam-safety': 150,
+  'call-saved-number': 130,
+  'spot-suspicious-link': 130,
+  'pay-bill-safely': 140,
 }
 export const STAGE_SIZE = 200
 export const DAILY_BONUS = 50

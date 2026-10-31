@@ -11,6 +11,11 @@ const LESSON_NAMES = {
   'share-family-photo': { en: 'sharing a family photo', ur: 'گھر والوں کو تصویر بھیجنا' },
   'whatsapp-voice-message': { en: 'sending a WhatsApp voice message', ur: 'واٹس ایپ پر آواز کا پیغام بھیجنا' },
   'scam-safety': { en: 'spotting fake messages', ur: 'جعلی پیغام پہچاننا' },
+  'one-line-reply': { en: 'sending a short reply', ur: 'مختصر جواب بھیجنا' },
+  'video-call-home': { en: 'making a video call', ur: 'ویڈیو کال کرنا' },
+  'call-saved-number': { en: 'calling the saved number', ur: 'محفوظ نمبر پر کال کرنا' },
+  'spot-suspicious-link': { en: 'leaving a suspicious link', ur: 'مشکوک لنک چھوڑنا' },
+  'pay-bill-safely': { en: 'paying a bill safely', ur: 'محفوظ طریقے سے بل ادا کرنا' },
 }
 
 // Confidence is explained in plain words, not a score: judges and learners both need to trust it.

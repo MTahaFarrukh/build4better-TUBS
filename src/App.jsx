@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
 import ScamScreen from './screens/ScamScreen'
+import ChoiceLessonScreen from './screens/ChoiceLessonScreen'
+import PhoneTaskScreen from './screens/PhoneTaskScreen'
+import { getChoiceLesson } from './data/choiceLessons'
+import { getPhoneTask } from './data/phoneTasks'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import PracticeLabScreen from './screens/PracticeLabScreen'
@@ -170,7 +174,7 @@ export default function App() {
             onResetProgress={handleResetProgress}
           />
         ) : safeView === VIEWS.lab ? (
-          activeLessonId === 'scam-safety' ? <ScamScreen mode={safeMode} onBack={goToDashboard} onCompleted={handleLabCompleted}/> : <PracticeLabScreen
+          activeLessonId === 'scam-safety' ? <ScamScreen mode={safeMode} onBack={goToDashboard} onCompleted={handleLabCompleted}/> : getChoiceLesson(activeLessonId) ? <ChoiceLessonScreen lessonId={activeLessonId} mode={safeMode} onBack={goToDashboard} onCompleted={handleLabCompleted}/> : getPhoneTask(activeLessonId) ? <PhoneTaskScreen lessonId={activeLessonId} mode={safeMode} onBack={goToDashboard} onCompleted={handleLabCompleted} onIndependent={() => startLab(activeLessonId, PRACTICE_MODES.independent)}/> : <PracticeLabScreen
             lessonId={activeLessonId}
             mode={safeMode}
             onBack={goToDashboard}
