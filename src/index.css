@@ -102,3 +102,44 @@
     border-width: 0;
   }
 }
+
+/* The lesson is a workspace: one task, one phone, help within reach. */
+.practice-stage { min-height: 100dvh; padding: 16px 24px 32px; background: radial-gradient(ellipse at 75% 40%, #d8e9df, transparent 65%), #f4f6f2; }
+.practice-toolbar { max-width: 1040px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.practice-layout { max-width: 940px; margin: 28px auto 0; display: grid; grid-template-columns: 1fr 420px; align-items: center; gap: 64px; }
+.practice-context { min-width: 0; }
+.practice-device { position: relative; min-width: 0; }
+.lab-action { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; border-radius: 12px; color: #183b35; background: #ffffffb3; font-size: 14px; cursor: pointer; }
+.lab-action:hover { background: #d7ede6; }
+.lab-primary { min-height: 48px; padding: 12px 22px; border-radius: 14px; background: #167d68; color: white; font-weight: 600; cursor: pointer; }
+.lesson-progress { display: flex; gap: 5px; margin-top: 12px; }
+.lesson-progress span { height: 5px; flex: 1; border-radius: 10px; background: #ccd9d0; }
+.lesson-progress .done { background: #167d68; transition: background .2s; }
+.practice-safety { font-size: 13px; color: #426458; margin-top: 20px; line-height: 1.6; }
+.context-hint { background: #fff4d8; border-left: 3px solid #bd8b28; border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.65; }
+.phone-frame { max-width: 420px; margin: auto; padding: 8px; border-radius: 38px; background: #202a29; box-shadow: 0 0 0 1px #66736d, 0 25px 65px #17392e30; }
+.phone-display { display: flex; flex-direction: column; height: min(740px, 82dvh); min-height: 600px; border-radius: 31px; overflow: hidden; background: #f8f6f0; }
+.phone-navigation { display: flex; align-items: center; justify-content: space-around; min-height: 44px; background: #fafaf8; color: #243c34; }
+.phone-navigation button { min-width: 64px; min-height: 44px; display: grid; place-items: center; cursor: pointer; }
+.pause-overlay { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f4f6f2f2; border-radius: 36px; }
+.chat-wallpaper { background-image: radial-gradient(#7e9d8a28 1px, transparent 1px); background-size: 20px 20px; }
+.record-button { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: #008069; color: white; touch-action: none; user-select: none; cursor: pointer; }
+.record-button.recording { background: #b93838; box-shadow: 0 0 0 5px #b938381c; }
+.recording-indicator { display: flex; align-items: center; gap: 10px; padding: 8px 0 14px; color: #962d2d; }
+.recording-dot { width: 9px; height: 9px; border-radius: 50%; background: #c43e3e; animation: record-pulse 1s infinite; }
+.voice-wave { flex: 1; overflow: hidden; white-space: nowrap; color: #008069; }
+button { touch-action: manipulation; }
+button:active { filter: brightness(.96); }
+@keyframes record-pulse { 50% { opacity: .3; } }
+@media (max-width: 760px) {
+  .practice-stage { padding: 8px 10px 16px; }
+  .practice-toolbar { gap: 4px; font-size: 14px; }
+  .practice-layout { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+  .practice-context, .practice-device { width: 100%; max-width: 420px; }
+  .practice-context h1 { font-size: 18px; margin-top: 8px; }
+  .practice-safety { margin-top: 8px; font-size: 12px; }
+  .phone-display { height: 630px; min-height: 0; }
+  .phone-frame { border-radius: 30px; padding: 5px; }
+  .phone-display { border-radius: 25px; }
+  .lab-action { padding: 8px 10px; }
+}

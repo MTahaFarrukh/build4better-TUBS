@@ -30,6 +30,8 @@ function createInitialState(lessonId, mode) {
     selectedRecipientId: null,
     activeChatId: null,
     isRecording: false,
+    recordingStartedAt: null,
+    assistanceCount: 0,
     voiceSent: false,
     shareConfirmed: false,
     chatMessages: {},
@@ -72,7 +74,9 @@ function wrong(state, hint) {
   return {
     ...state,
     incorrectAttempts: state.incorrectAttempts + 1,
-    hint,
+    hint: state.mode === PRACTICE_MODES.independent
+      ? buildHint('That action is not part of this task. Try again, or ask for help.', 'یہ عمل اس مشق کا حصہ نہیں۔ دوبارہ کوشش کریں یا مدد لیں۔')
+      : state.incorrectAttempts >= 1 ? hint : buildHint('Try another tap. Follow the glowing outline.', 'دوبارہ کوشش کریں۔ نمایاں بٹن دیکھیں۔'),
   }
 }
 
@@ -93,7 +97,8 @@ function finish(state, completedSteps) {
       incorrectAttempts: state.incorrectAttempts,
       successfulActions: state.successfulActions + 1,
       durationMs: Math.max(0, finishedAt - state.startedAt),
-      completedWithoutAssistance: state.mode === PRACTICE_MODES.independent,
+      completedWithoutAssistance: state.mode === PRACTICE_MODES.independent && state.assistanceCount === 0,
+      assistanceCount: state.assistanceCount,
       completedSteps,
       finishedAt: new Date(finishedAt).toISOString(),
     },
@@ -144,6 +149,7 @@ function reducer(state, action) {
       if (!step) return state
       return {
         ...state,
+        assistanceCount: state.assistanceCount + 1,
         hint: buildHint(step.helpEn, step.helpUr),
       }
     }
@@ -254,7 +260,7 @@ function reducer(state, action) {
 
     case 'SELECT_RECIPIENT': {
       if (!isPhoto) return state
-      if (!expectStep(state, 4) && state.guidedEnabled) {
+      if (!expectStep(state, 4) && !expectStep(state, 5) && state.guidedEnabled) {
         return wrong(state, buildHint(lesson.steps[3].helpEn, lesson.steps[3].helpUr))
       }
       const guided = advanceGuided(state, 4)
@@ -315,7 +321,7 @@ function reducer(state, action) {
     }
 
     case 'START_RECORDING': {
-      if (!isVoice) return state
+      if (!isVoice || state.isRecording) return state
       if (state.screen !== SCREENS.whatsappChat || !state.activeChatId) {
         return wrong(state, buildHint('Open a chat first.', 'پہلے چیٹ کھولیں۔'))
       }
@@ -330,6 +336,7 @@ function reducer(state, action) {
         ...state,
         ...guided,
         isRecording: true,
+        recordingStartedAt: Date.now(),
         hint: null,
         successfulActions: onStep ? state.successfulActions + 1 : state.successfulActions,
         completedStepIds: onStep
@@ -352,13 +359,17 @@ function reducer(state, action) {
       if (!expectStep(state, 4) && state.guidedEnabled) {
         // Allow send if they advanced somehow
       }
+      if (Date.now() - state.recordingStartedAt < 700) {
+        return { ...state, isRecording: false, recordingStartedAt: null, guidedStep: 3,
+          hint: buildHint('Hold a little longer, then release. Try again.', 'تھوڑی دیر دبائے رکھیں، پھر چھوڑیں۔ دوبارہ کوشش کریں۔') }
+      }
       const guided = advanceGuided(state, 4)
       const existing = state.chatMessages[state.activeChatId] ?? []
       const voiceMessage = {
         id: `voice-${Date.now()}`,
         from: 'me',
         type: 'voice',
-        durationSec: 2,
+        durationSec: Math.max(1, Math.round((Date.now() - state.recordingStartedAt) / 1000)),
       }
       return finish(
         {
@@ -376,16 +387,18 @@ function reducer(state, action) {
     }
 
     case 'CANCEL_RECORDING':
-      return { ...state, isRecording: false }
+      if (!state.isRecording) return state
+      return { ...state, isRecording: false, recordingStartedAt: null, guidedStep: 3, hint: null }
 
     case 'BACK': {
       if (state.screen === SCREENS.share) {
-        return { ...state, screen: SCREENS.preview, hint: null, confirmError: null }
+        return { ...state, screen: SCREENS.preview, guidedStep: 3, selectedRecipientId: null, hint: null, confirmError: null }
       }
       if (state.screen === SCREENS.preview) {
         return {
           ...state,
           screen: SCREENS.gallery,
+          guidedStep: 2,
           selectedPhotoId: null,
           hint: null,
         }
@@ -394,6 +407,7 @@ function reducer(state, action) {
         return {
           ...state,
           screen: SCREENS.whatsappList,
+          guidedStep: 2,
           activeChatId: null,
           isRecording: false,
           hint: null,
@@ -407,11 +421,13 @@ function reducer(state, action) {
         return {
           ...createInitialState(state.lessonId, state.mode),
           guidedEnabled: state.guidedEnabled,
-          guidedStep: state.guidedStep,
+          guidedStep: 1,
           maxReachedStep: state.maxReachedStep,
           incorrectAttempts: state.incorrectAttempts,
           successfulActions: state.successfulActions,
           startedAt: state.startedAt,
+          assistanceCount: state.assistanceCount,
+          completedStepIds: state.completedStepIds,
         }
       }
       return state
@@ -419,7 +435,10 @@ function reducer(state, action) {
 
     case 'GO_HOME':
       return {
-        ...createInitialState(state.lessonId, state.mode),
+        ...state,
+        screen: SCREENS.home,
+        selectedPhotoId: null, selectedRecipientId: null, activeChatId: null,
+        isRecording: false, recordingStartedAt: null, hint: null, confirmError: null,
         guidedEnabled: state.guidedEnabled,
         guidedStep: 1,
         maxReachedStep: state.maxReachedStep,

@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   Compass,
   ImagePlus,
-  Lock,
   Mic,
   RotateCcw,
   Smartphone,
@@ -12,7 +11,6 @@ import AppShell from '../components/layout/AppShell'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { INTERACTIVE_LESSONS, LESSON_IDS } from '../data/interactiveLessons'
-import { COMING_SOON_LESSONS } from '../data/lessons'
 import {
   formatDuration,
   getProgressLabel,
@@ -64,10 +62,10 @@ export default function DashboardScreen({
           Back to welcome
         </button>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
-          Your learning space
+          What would you like to learn?
         </h1>
         <p className="mt-2 max-w-3xl text-lg leading-relaxed text-ink/80">
-          Learn by doing on a safe practice phone. Complete Guided Practice, then try Independent Practice.
+          Choose a lesson. We will help you, one tap at a time.
         </p>
         <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
           محفوظ مشق والے فون پر خود کر کے سیکھیں — پہلے رہنمائی، پھر خود۔
@@ -112,7 +110,7 @@ export default function DashboardScreen({
                           className="w-full sm:w-fit"
                         >
                           <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                          {guidedDone ? 'Replay guided practice' : 'Start guided practice'}
+                          {guidedDone ? 'Replay guided practice' : 'Start here · شروع کریں'}
                         </Button>
                         <Button
                           variant="secondary"
@@ -120,7 +118,7 @@ export default function DashboardScreen({
                           className="w-full sm:w-fit"
                         >
                           <Compass className="h-5 w-5" aria-hidden="true" />
-                          {independentDone ? 'Replay independent practice' : 'Independent Practice'}
+                          {independentDone ? 'Replay independent practice' : 'Try on my own · خود کریں'}
                         </Button>
                         <p className="text-sm text-forest-muted">
                           You perform every tap inside the practice phone. Nothing real is sent.
@@ -163,7 +161,7 @@ export default function DashboardScreen({
             <p className="mt-2 text-sm text-forest-muted">
               Progress tracks practice on this device — not real-world phone skill.
             </p>
-            <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage">
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage" role="progressbar" aria-label="Completed practice sessions" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPercent}>
               <div
                 className="h-full rounded-full bg-teal transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
@@ -197,20 +195,7 @@ export default function DashboardScreen({
             </Card>
           )}
 
-          <Card className="p-6">
-            <h2 className="font-display text-xl font-semibold text-forest">Coming soon</h2>
-            <ul className="mt-4 space-y-3">
-              {COMING_SOON_LESSONS.map((item) => (
-                <li key={item.id} className="flex items-start gap-3 rounded-2xl bg-sage/60 px-4 py-3">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-forest-muted" aria-hidden="true" />
-                  <div>
-                    <p className="font-medium text-forest">{item.title}</p>
-                    <p className="text-sm text-forest-muted">{item.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Card>
+
         </aside>
       </div>
     </AppShell>

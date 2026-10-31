@@ -26,7 +26,7 @@ export default function PhotoPreview({ photo, onBack, onShare, isHighlighted }) 
           <img
             src={photo.src}
             alt={photo.caption}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
         </div>
 

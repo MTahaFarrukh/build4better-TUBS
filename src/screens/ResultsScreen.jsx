@@ -200,7 +200,7 @@ export default function ResultsScreen({
                 </p>
                 <p className="mt-3 text-base text-forest-muted">
                   {isIndependent
-                    ? 'You finished this practice without the step-by-step guide. Nothing was sent outside this practice phone.'
+                    ? result?.completedWithoutAssistance ? 'Completed independently, without hints. Nothing real was sent.' : `Completed with optional help (${result?.assistanceCount ?? 0} hints). Try again when you feel ready.`
                     : 'You finished with guided help available. Nothing was sent outside this practice phone.'}
                 </p>
               </div>

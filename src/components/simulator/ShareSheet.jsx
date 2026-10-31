@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import { PRACTICE_CONTACTS } from '../../data/gallery'
@@ -13,13 +13,22 @@ export default function ShareSheet({
   isHighlighted,
   confirmError = null,
 }) {
+  const dialogRef = useRef(null)
   useEffect(() => {
     if (!open) return undefined
+    const previous = document.activeElement
+    dialogRef.current?.querySelector('button[aria-label="Close share sheet"]')?.focus()
     const onKeyDown = (event) => {
       if (event.key === 'Escape') onClose()
+      if (event.key === 'Tab') {
+        const buttons = [...dialogRef.current.querySelectorAll('button')]
+        const index = buttons.indexOf(document.activeElement)
+        event.preventDefault()
+        buttons[(index + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length]?.focus()
+      }
     }
     window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    return () => { window.removeEventListener('keydown', onKeyDown); previous?.focus() }
   }, [open, onClose])
 
   return (
@@ -30,6 +39,7 @@ export default function ShareSheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="share-sheet-title"
@@ -46,7 +56,7 @@ export default function ShareSheet({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="rounded-t-[1.75rem] bg-ivory px-5 pt-4 pb-6 shadow-lift"
+            className="max-h-full overflow-y-auto rounded-t-[1.75rem] bg-ivory px-5 pt-4 pb-6 shadow-lift"
           >
             <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-forest/20" aria-hidden="true" />
 

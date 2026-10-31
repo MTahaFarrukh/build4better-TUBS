@@ -50,12 +50,10 @@ export default function HomeScreen({
 
   return (
     <div className="flex h-full flex-col bg-gradient-to-b from-sage via-ivory to-teal-soft px-5 pt-6 pb-4">
-      <div className="mb-8">
-        <p className="text-xs font-semibold tracking-[0.16em] text-teal uppercase">Home</p>
-        <h2 className="font-display mt-1 text-2xl font-semibold text-forest">Practice phone</h2>
-        <p className="mt-2 text-sm leading-relaxed text-ink/75">
-          Safe Practice Mode — tap apps here to learn by doing. Nothing real is sent.
-        </p>
+      <div className="mb-8 pt-4 text-center">
+        <p className="text-5xl font-light tracking-tight text-forest">10:10</p>
+        <p className="mt-2 text-base text-forest-muted">A little practice, every day</p>
+        <p className="mt-1 text-sm text-forest-muted" lang="ur" dir="rtl">ہر روز تھوڑی سی مشق</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -100,22 +98,7 @@ export default function HomeScreen({
         })}
       </div>
 
-      <div className="mt-auto flex items-center justify-around rounded-[1.5rem] bg-forest/90 px-3 py-3 text-ivory">
-        <span className="text-xs font-medium opacity-80" aria-hidden="true">
-          Recents
-        </span>
-        <button
-          type="button"
-          onClick={onGoHome}
-          className="rounded-full bg-ivory/15 px-4 py-2 text-sm font-semibold focus-visible:outline-offset-4"
-          aria-label="Stay on practice home screen"
-        >
-          Home
-        </button>
-        <span className="text-xs font-medium opacity-80" aria-hidden="true">
-          Back
-        </span>
-      </div>
+      <button onClick={onGoHome} className="mt-auto rounded-3xl bg-white/60 py-4 text-sm text-forest-muted">Practice phone · مشق کا فون</button>
     </div>
   )
 }

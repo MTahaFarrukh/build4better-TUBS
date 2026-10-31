@@ -38,12 +38,13 @@ export default function PhoneWorkspace({ phone }) {
   const transition = reduceMotion ? { duration: 0 } : { duration: 0.2 }
 
   return (
-    <PhoneFrame>
+    <PhoneFrame onBack={goBack} onHome={goHome}>
       <div className="relative min-h-0 flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={screenKey}
             className="absolute inset-0"
+            inert={state.screen === SCREENS.share ? "" : undefined}
             initial={reduceMotion ? false : { opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={reduceMotion ? undefined : { opacity: 0, x: -10 }}
@@ -90,6 +91,7 @@ export default function PhoneWorkspace({ phone }) {
                 chatId={state.activeChatId}
                 extraMessages={state.chatMessages[state.activeChatId] ?? []}
                 isRecording={state.isRecording}
+                recordingStartedAt={state.recordingStartedAt}
                 onBack={goBack}
                 onStartRecording={startRecording}
                 onSendVoice={sendVoice}

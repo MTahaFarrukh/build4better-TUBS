@@ -43,7 +43,8 @@ function sanitizeResult(raw) {
     incorrectAttempts: Number.isFinite(incorrectAttempts) ? Math.max(0, incorrectAttempts) : 0,
     successfulActions: Number.isFinite(successfulActions) ? Math.max(0, successfulActions) : 0,
     durationMs: Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : null,
-    completedWithoutAssistance: Boolean(raw.completedWithoutAssistance),
+    assistanceCount: Number.isFinite(Number(raw.assistanceCount)) ? Math.max(0, Number(raw.assistanceCount)) : 0,
+    completedWithoutAssistance: Boolean(raw.completedWithoutAssistance) && !(Number(raw.assistanceCount) > 0),
     completedSteps: Array.isArray(raw.completedSteps)
       ? raw.completedSteps.filter((step) => typeof step === 'string')
       : [],
@@ -93,14 +94,9 @@ export function normalizeProgress(raw) {
 
 export function getProgressPercent(progress) {
   const data = normalizeProgress(progress)
-  const guided = data.guidedCompletedIds.length
-  const independent = data.independentCompletedIds.length
-  if (guided >= 2 && independent >= 2) return 100
-  if (independent >= 1 && guided >= 1) return 85
-  if (independent >= 1 || guided >= 2) return 70
-  if (guided >= 1) return 45
-  if (data.lessonsStarted || data.followAlongStarted) return 20
-  return 0
+  const ids = ['share-family-photo', 'whatsapp-voice-message']
+  const completed = ids.reduce((count, id) => count + Number(data.guidedCompletedIds.includes(id)) + Number(data.independentCompletedIds.includes(id)), 0)
+  return completed * 25
 }
 
 export function getProgressLabel(progress) {

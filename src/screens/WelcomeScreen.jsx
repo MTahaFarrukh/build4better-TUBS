@@ -17,7 +17,7 @@ export default function WelcomeScreen({ onStart }) {
   return (
     <AppShell showBrand={false}>
       <section className="grid flex-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-        <div className="order-2 lg:order-1">
+        <div className="order-1">
           <motion.p
             custom={0}
             variants={fadeUp}
@@ -58,7 +58,7 @@ export default function WelcomeScreen({ onStart }) {
             className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
             <Button onClick={onStart} className="w-full sm:w-auto">
-              Start learning
+              Start learning · سیکھنا شروع کریں
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Button>
             <p className="flex items-center gap-2 text-base text-forest-muted sm:pl-2">
@@ -68,7 +68,7 @@ export default function WelcomeScreen({ onStart }) {
           </motion.div>
         </div>
 
-        <div className="order-1 lg:order-2">
+        <div className="order-2 hidden lg:block">
           <PhonePreview />
         </div>
       </section>
