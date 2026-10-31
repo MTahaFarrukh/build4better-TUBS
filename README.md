@@ -1,115 +1,203 @@
 # Digital Ustaad
 
-**Team TUBS · Build4Better 2026**
+<p align="center">
+  <img src="public/icons/icon-512.png" alt="Digital Ustaad" width="96" height="96" />
+</p>
 
-Digital Ustaad is a practice app for Pakistani parents and grandparents who did not grow up with smartphones. It teaches everyday phone tasks in simple English and Urdu. The learner does the steps. The app does not do the task for them.
+<p align="center">
+  <strong>Learn your phone by doing — safely, patiently, in English &amp; Urdu.</strong><br/>
+  Team <b>TUBS</b> · Build4Better 2026
+</p>
 
-## Target user and problem
+<p align="center">
+  <a href="https://digital-ustaad.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-digital--ustaad.vercel.app-167D68?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick%20Start-npm%20run%20dev-183B35?style=for-the-badge" alt="Quick Start" /></a>
+  <a href="./DEMO_SCRIPT.md"><img src="https://img.shields.io/badge/Demo%20Script-2%20min-F3C15A?style=for-the-badge" alt="Demo script" /></a>
+</p>
 
-The people this is for are parents and grandparents, especially around age 50 and older. Everyday actions feel risky: sending a photo, a WhatsApp voice note, a video call, a bill payment, or a message that might be a scam. When they get stuck, they call their children. Many avoid the tools that would help them because they are afraid of breaking something or looking foolish.
+<p align="center">
+  <b>Try it live:</b> <a href="https://digital-ustaad.vercel.app/">https://digital-ustaad.vercel.app/</a>
+</p>
 
-## Solution and core features
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/PWA-Offline%20ready-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA" />
+  <img src="https://img.shields.io/badge/Capacitor-7-119EFF?style=flat-square&logo=capacitor&logoColor=white" alt="Capacitor" />
+  <img src="https://img.shields.io/badge/Language-EN%20%2B%20Urdu-F3C15A?style=flat-square" alt="EN + Urdu" />
+  <img src="https://img.shields.io/badge/Privacy-Practice%20only-2A524A?style=flat-square" alt="Practice only" />
+  <img src="https://img.shields.io/badge/Lessons-8%20interactive-E85D4C?style=flat-square" alt="8 lessons" />
+</p>
 
-Digital Ustaad is a practice phone plus short lessons. A lesson can be done with Ustaad (step by step) or alone. Points, streak, and lesson progress are saved on that phone only. There is no account and no server.
+---
 
-Lessons:
+## Why Digital Ustaad?
 
-1. Share a family photo — open Gallery, choose a practice photo, share it with a fictional family contact.
-2. Send a voice message — open WhatsApp, open a chat, hold the mic, release to send.
-3. Send a short reply — open Ammi’s chat and send «جی، ٹھیک ہے».
-4. Make a video call — call Beti on the practice phone, then hang up.
-5. Spot a fake message — prize, “new number, send money”, and parcel-fee messages.
-6. Call the saved number — when a new number asks for money or a code, call the number already saved.
-7. Leave a suspicious link — do not open it and do not forward it.
-8. Pay a bill safely — check the name and the amount, and refuse a message that asks for the PIN.
+Digital Ustaad is a practice app for Pakistani parents and grandparents who did not grow up with smartphones. Everyday actions feel risky — photos, WhatsApp, bills, scam messages. Static tutorials don’t stick.
 
-Also included:
+**Digital Ustaad** is a calm **practice phone**: learners do the steps themselves. The app does not do the task for them. **Nothing real is ever sent.**
 
-- English and real Urdu, including right-to-left layout
-- Spoken Urdu from recordings shipped with the app, and English from the phone’s own voice
-- Easy (light, larger type) and dark themes
-- A results screen with plain-language confidence, plus a way to tell family on WhatsApp
-- A separate real-phone guide for a WhatsApp voice note on Android. The guide can open WhatsApp. It never reads chats or checks that a message was sent
-- Installable website (PWA) so lessons and Urdu recordings open again without internet after the first visit
-- An Android shell with Capacitor for that real-phone guide
+> **استاد کے ساتھ سیکھیں، خود آزمائیں، محفوظ رہیں۔**  
+> Learn with Ustaad · Try alone · Stay safe.
 
-Practice lessons use fictional people, photos, bills, and messages. Nothing real is sent, paid, or called.
+---
 
-## Setup and run
+## Highlights
+
+| | |
+|:---|:---|
+| **Learn by doing** | Simulated phone + decision lessons — not a wall of text. |
+| **Guided + Independent** | Learn with Ustaad first, then try alone. |
+| **Urdu + English** | Language gate, RTL, spoken Urdu clips + English speech. |
+| **Gamified journey** | Points, stages, streaks, daily bonus, badges. |
+| **Privacy first** | Fictional photos/contacts/chats/bills. No accounts. No API keys for core learning. |
+| **Installable PWA** | Offline shell after first visit / `npm run build`. |
+
+---
+
+## Learning path — 8 lessons
+
+| # | Badge | Lesson | What you practise |
+|:-:|:-----:|:-------|:------------------|
+| 1 | Photo | **Share a family photo** | Gallery → pick → Share → family contact |
+| 2 | Voice | **Send a voice message** | WhatsApp → hold mic → release to send |
+| 3 | Reply | **Send a short reply** | Ammi’s chat → «جی، ٹھیک ہے» |
+| 4 | Call | **Make a video call** | Call Beti → hang up (practice UI) |
+| 5 | Safety | **Spot a fake message** | Pause → verify → block / report |
+| 6 | Saved | **Call the saved number** | Don’t trust a new number asking for money |
+| 7 | Link | **Leave a suspicious link** | Don’t open / forward message links |
+| 8 | Bill | **Pay a bill safely** | Check name & amount · never share the PIN |
+
+Each lesson: **Learn with Ustaad** → **Try alone** → **Results** (practice feedback only).
+
+Optional: **Follow-Along** real-phone WhatsApp guide (opens WhatsApp on Android; never reads chats).
+
+---
+
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the URL shown in the terminal (usually `http://localhost:5173`).
+Open the URL in the terminal (usually `http://localhost:5173`).
+
+| Command | What it does |
+|:--------|:-------------|
+| `npm run dev` | Local development server |
+| `npm run lint` | ESLint |
+| `npm test` | Practice-phone + catalog checks |
+| `npm run build` | Production build + offline PWA shell |
+| `npm run preview` | Preview the production build |
+| `npm run test:full` | Tests + rebuild + offline shell check |
+
+**Live deploy:** [https://digital-ustaad.vercel.app/](https://digital-ustaad.vercel.app/)
+
+### Android (optional Follow-Along)
+
+Needs JDK 21+ and Android Studio:
 
 ```bash
-npm run lint
-npm run build
-npm run preview
-```
-
-`npm run build` also writes the offline service worker.
-
-Android follow-along needs JDK 21+ and Android Studio:
-
-```bash
-npm install
 npm run cap:sync:android
 npx cap open android
 ```
 
-On a phone with USB debugging:
+---
 
-```bash
-adb devices
-npm run cap:sync:android
-cd android
-.\gradlew.bat installDebug
-```
+## Tech stack
 
-## Technology stack
+<p>
+  <img src="https://img.shields.io/badge/Frontend-React%2018-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Bundler-Vite%206-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Styles-Tailwind%20v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Motion-Framer%20Motion-0055FF?style=for-the-badge" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Icons-Lucide-000000?style=for-the-badge" alt="Lucide" />
+  <img src="https://img.shields.io/badge/Storage-LocalStorage-FFB000?style=for-the-badge" alt="LocalStorage" />
+  <img src="https://img.shields.io/badge/Mobile-Capacitor%207-119EFF?style=for-the-badge&logo=capacitor&logoColor=white" alt="Capacitor" />
+</p>
 
-- React 18 and Vite 6
-- Tailwind CSS v4
-- Framer Motion
-- Lucide React
-- LocalStorage for language, theme, voice, and progress
-- Capacitor 7 and a small Android plugin that opens WhatsApp or WhatsApp Business
-- A production service worker for offline use on the web
+- No backend for the core experience  
+- PWA: `public/manifest.webmanifest` + `scripts/build-pwa.mjs` → `dist/sw.js`  
+- Capacitor 7 + small Android plugin to open WhatsApp / WhatsApp Business  
 
-Dependencies are listed in `package.json`.
+---
 
-## AI tools and third-party credits
+## Privacy & Practice Mode
 
-- **Cursor** — AI assistance for coding, debugging, and this README during the build
-- **React, Vite, Tailwind CSS, Framer Motion, Lucide, Capacitor** — open-source libraries
-- **Google Fonts** — Lexend and Noto Nastaliq Urdu, loaded in the browser
-- **Google Translate speech** — used once, while building, to record the Urdu lines saved in `public/voice/ur`. The running app plays those files. It does not call Google during a lesson
-- Gallery pictures are original SVG illustrations made for this project
+<p>
+  <img src="https://img.shields.io/badge/Real%20gallery-Never%20accessed-2A524A?style=flat-square" alt="No gallery" />
+  <img src="https://img.shields.io/badge/Real%20WhatsApp-Never%20read-2A524A?style=flat-square" alt="No WhatsApp" />
+  <img src="https://img.shields.io/badge/Real%20payments-Never%20sent-2A524A?style=flat-square" alt="No payments" />
+  <img src="https://img.shields.io/badge/Accounts-None-2A524A?style=flat-square" alt="No accounts" />
+</p>
 
-## Limitations
+- Practice Mode labelled throughout  
+- Fictional photos, contacts, chats, bills, and scam messages only  
+- Progress stays in LocalStorage on this device  
+- Coaching is deterministic — not a live AI tutor API  
 
-- Lessons are practice. They do not send a real message, place a real call, or move real money
-- The real-phone WhatsApp guide opens the app only. The learner does every step and confirms when they are done
-- The website cannot open WhatsApp by itself. That launch exists in the Android app
-- Progress stays on one browser or installed app. Clearing site data removes it. There is no login and no shared family dashboard
-- Urdu speech is the shipped recordings. A changed Urdu sentence needs a new recording (`node scripts/build-urdu-voice.mjs`)
-- English speech uses whatever English voice the phone already has
-- The first visit needs internet to download the app and the fonts. After a home-screen install, lessons and Urdu audio work offline. Fonts may fall back to the phone’s own type
-- There is no lesson for a banking app signing the user out, or for a government form
+---
 
-## Team
+## Honest limitations
 
-**TUBS** — Build4Better 2026
+| Simulated | Meaning |
+|:----------|:--------|
+| Voice note | Hold / release UI — no real mic upload |
+| Video call | Practice call screen only |
+| Bill pay | Practice Wallet — no real money |
+| Scam messages | Fictional scenarios |
+| Coaching | Scripted Ustaad help |
+| Progress | Practice feedback — not a real-world literacy score |
 
-- Uzair Ahmed
-- Taha Farrukh
-- Bilal Rasheed
+- Website cannot open WhatsApp by itself; Android app can for Follow-Along  
+- Urdu speech uses shipped recordings (`public/voice/ur`); English uses the device voice  
+- First visit needs internet; after install, lessons + Urdu audio can work offline  
+
+---
+
+## Demo
+
+- **Live app:** [https://digital-ustaad.vercel.app/](https://digital-ustaad.vercel.app/)  
+- **Narration:** [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md) (~2 minutes)
+
+Suggested arc: Welcome → learning path → photo share → voice/reply → safety → badges & privacy.
+
+---
+
+## Team & credits
+
+**TUBS — Build4Better 2026**
+
+- Uzair Ahmed  
+- Taha Farrukh  
+- Bilal Rasheed  
+
+| | |
+|:---|:---|
+| **Repo** | [MTahaFarrukh/build4better-TUBS](https://github.com/MTahaFarrukh/build4better-TUBS) |
+| **Build assist** | Cursor during the hackathon window |
+| **Art** | Original SVG gallery illustrations |
+| **Urdu voice** | Recordings shipped with the app (built once with Translate speech tooling; app does not call Google during lessons) |
+| **Fonts** | Lexend + Noto Nastaliq Urdu |
+| **Libraries** | See `package.json` |
+
+---
 
 ## Submitted commit
 
-Final submitted commit identifier: `45871369ea231fd53653d41b37512836ce0d2441`
+Update after this push:
 
-That commit contains the app and this README, including the team above. The commit after it only writes this identifier.
+```bash
+git rev-parse HEAD
+```
+
+Paste the full SHA into the submission form.
+
+---
+
+<p align="center">
+  <b>Digital Ustaad</b> — patient smartphone practice for Pakistani families.<br/>
+  <sub>Practice Mode · Nothing real is sent · EN + اردو</sub>
+</p>

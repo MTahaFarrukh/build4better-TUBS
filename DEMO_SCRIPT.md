@@ -1,53 +1,67 @@
 # Digital Ustaad — Demo Script (under 2 minutes)
 
 **Team:** TUBS · Build4Better 2026  
-**Suggested length:** 90–110 seconds
+**Suggested length:** 90–120 seconds  
+**On screen:** production web build (or `npm run dev`)
 
 ---
 
 ### 0:00–0:15 — Hook
-“Many Pakistani parents and grandparents want to use their phones for family photos and WhatsApp voice notes, but a real phone can feel confusing. Digital Ustaad is a calm practice phone — you learn by doing, and nothing real is sent.”
+“Pakistani parents and grandparents want to use phones for family and stay safe from scams — but a real phone can feel scary. Digital Ustaad is a calm practice phone. You learn by doing. Nothing real is sent.”
 
-**On screen:** Welcome → tap Start learning
-
----
-
-### 0:15–0:30 — Dashboard
-“Two complete interactive lessons: share a family photo, and send a WhatsApp voice message. Each has Guided Practice and Independent Practice.”
-
-**On screen:** Dashboard with both lessons
+**On screen:** Language gate → Welcome → Start
 
 ---
 
-### 0:30–1:05 — Guided photo share
-“In Guided Practice, Ustaad highlights each step on the practice phone: open Gallery, choose a photo, Share, pick Ammi or Abu, Confirm. Wrong taps get a gentle tip. All contacts and photos are fictional.”
+### 0:15–0:30 — Learning path
+“Eight lessons on one path: share a photo, voice note, short reply, video call, spot fakes, call a saved number, leave a bad link, and pay a bill safely. English and Urdu. Points and badges stay on this device.”
 
-**On screen:** Complete guided photo-share once (or jump to success)
-
----
-
-### 1:05–1:30 — Voice message (quick)
-“Same idea for WhatsApp: open the practice app, open Ammi’s chat, hold the mic, release to send a practice voice note.”
-
-**On screen:** Brief guided voice attempt or success state
+**On screen:** Dashboard learning path (scroll briefly)
 
 ---
 
-### 1:30–1:50 — Results + safety
-“Results show helpful taps, extra tries, and time for this attempt only — not a real-world skill score. Independent Practice removes the step guide. Progress stays on this device.”
+### 0:30–0:55 — Guided photo share
+“With Ustaad, every tap happens on the practice phone: Gallery, choose a photo, Share, pick Ammi, Confirm. Wrong taps get a gentle tip. Contacts and photos are fictional.”
 
-**On screen:** Results → Back to Dashboard
+**On screen:** Guided photo lesson → success/results flash
 
 ---
 
-### 1:50–2:00 — Close
+### 0:55–1:15 — Voice or reply (pick one)
+**Option A — Voice:** “Hold the mic, release to send a practice voice note.”  
+**Option B — Reply:** “Open Ammi’s chat and send جی، ٹھیک ہے.”
+
+**On screen:** Quick completion of the chosen lesson
+
+---
+
+### 1:15–1:40 — Safety
+“Safety lessons teach Pause → check through someone you trust → act. Example: a new number asks for money — call the saved number instead. Or leave a suspicious link and open the real app yourself.”
+
+**On screen:** Scam or “Call the saved number” choice lesson → correct action
+
+---
+
+### 1:40–1:55 — Independence + privacy
+“Try alone removes the step guide. Results show practice only — not a real-world grade. Installable offline. No real gallery, WhatsApp, or payments.”
+
+**On screen:** Dashboard badges / Install hint / Practice Mode label
+
+---
+
+### 1:55–2:00 — Close
 “Digital Ustaad — patient smartphone practice for Pakistani families. Built by Team TUBS.”
 
 ---
 
 ## Do not claim in the video
-- Real phone integration
-- Real messaging, mic audio upload, or contact access
-- AI tutoring that is not implemented
-- That one practice proves real-world digital literacy
-- Unfinished “coming soon” lessons as working features
+- Real messaging, real payments, or contact access  
+- Live AI tutoring APIs  
+- That practice alone proves real-world digital literacy  
+- Unfinished features as shipping product  
+
+## Suggested judge talking points
+- Learn by doing inside a simulated phone  
+- Urdu + English, including spoken Urdu clips  
+- Eight complete interactive lessons (skills + safety)  
+- Offline PWA, no accounts, no API keys for the core path  

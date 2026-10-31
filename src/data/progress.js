@@ -171,18 +171,25 @@ export function normalizeProgress(raw) {
   }
 }
 
+export const LEARNING_PATH_IDS = Object.keys(LESSON_POINTS)
+
 export function getProgressPercent(progress) {
   const data = normalizeProgress(progress)
-  const ids = ['share-family-photo', 'whatsapp-voice-message']
-  const completed = ids.reduce((count, id) => count + Number(data.guidedCompletedIds.includes(id)) + Number(data.independentCompletedIds.includes(id)), 0)
-  return completed * 25
+  const total = LEARNING_PATH_IDS.length || 1
+  const score = LEARNING_PATH_IDS.reduce((sum, id) => {
+    if (data.masteredIds.includes(id)) return sum + 1
+    if (data.independentCompletedIds.includes(id)) return sum + 0.7
+    if (data.guidedCompletedIds.includes(id)) return sum + 0.4
+    return sum
+  }, 0)
+  return Math.min(100, Math.round((score / total) * 100))
 }
 
 export function getProgressLabel(progress) {
   const data = normalizeProgress(progress)
-  if (data.guidedCompletedIds.length >= 2 && data.independentCompletedIds.length >= 2) {
-    return 'Both lessons practised'
-  }
+  const mastered = data.masteredIds.length
+  if (mastered >= LEARNING_PATH_IDS.length) return 'All lessons mastered'
+  if (mastered) return `${mastered} lesson${mastered === 1 ? '' : 's'} mastered`
   if (data.independentCompletedIds.length) return 'Independent practice completed'
   if (data.guidedCompletedIds.length) return 'Guided practice completed'
   if (data.lessonsStarted) return 'Practice started'
