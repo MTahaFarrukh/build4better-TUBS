@@ -1,33 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft,
-  CheckCircle2,
-  CircleHelp,
-  ExternalLink,
-  Pause,
-  Play,
-  RotateCcw,
-  ShieldCheck,
-  Smartphone,
-  X,
+  ArrowLeft, ArrowRight, CheckCircle2, CircleHelp, ExternalLink, Gamepad2,
+  Pause, Play, RotateCcw, ShieldCheck, Smartphone,
 } from 'lucide-react'
-import AppShell from '../components/layout/AppShell'
-import Button from '../components/ui/Button'
-import Card from '../components/ui/Card'
-import PracticeBadge from '../components/simulator/PracticeBadge'
+import Language from '../components/journey/Language'
+import ThemeToggle from '../components/journey/ThemeToggle'
+import VoiceToggle from '../components/journey/VoiceToggle'
 import { getFollowAlongLesson } from '../data/followAlong'
+import { useLanguage } from '../hooks/useLanguage'
+import { useVoicePreference } from '../hooks/usePreference'
+import { useSpeechCoach } from '../hooks/useSpeechCoach'
 import {
   checkWhatsAppApps,
   isNativeAndroid,
   openWhatsAppApp,
 } from '../native/whatsappLauncher'
 
-export default function FollowAlongScreen({
-  lessonId,
-  onBack,
-  onLessonCompleted,
-}) {
+export default function FollowAlongScreen({ lessonId, onBack, onLessonCompleted }) {
   const lesson = useMemo(() => getFollowAlongLesson(lessonId), [lessonId])
+  const { ur, t } = useLanguage()
+  const { voice } = useVoicePreference()
+  const { supported, speak, stop } = useSpeechCoach()
   const stepCardRef = useRef(null)
   const [stepIndex, setStepIndex] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -36,16 +29,13 @@ export default function FollowAlongScreen({
   const [launchStatus, setLaunchStatus] = useState(null)
   const [appAvailability, setAppAvailability] = useState(null)
   const [launching, setLaunching] = useState(false)
-  const [repeatNotice, setRepeatNotice] = useState('')
+  const Arrow = ur ? ArrowLeft : ArrowRight
+  const lang = ur ? 'ur-PK' : 'en-US'
 
   useEffect(() => {
     let active = true
-    checkWhatsAppApps().then((status) => {
-      if (active) setAppAvailability(status)
-    })
-    return () => {
-      active = false
-    }
+    checkWhatsAppApps().then((status) => { if (active) setAppAvailability(status) })
+    return () => { active = false }
   }, [])
 
   useEffect(() => {
@@ -53,23 +43,34 @@ export default function FollowAlongScreen({
     setLaunchStatus(null)
   }, [stepIndex])
 
+  const step = lesson?.steps[stepIndex]
+  const spoken = paused
+    ? (ur ? lesson?.pauseMessage.ur : lesson?.pauseMessage.en)
+    : showHelp
+      ? (ur ? step?.help.ur : step?.help.en)
+      : (ur ? step?.instruction.ur : step?.instruction.en)
+
+  useEffect(() => {
+    if (!voice || !supported || completed || !spoken) return
+    speak(spoken, lang)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIndex, paused, showHelp, voice, supported, ur, completed])
+
   if (!lesson) {
     return (
-      <AppShell onBrandClick={onBack}>
-        <p className="text-lg text-ink">This Follow-Along lesson was not found.</p>
-        <Button className="mt-4" onClick={onBack}>
-          Back to dashboard
-        </Button>
-      </AppShell>
+      <main className="game-world follow-game" dir={ur ? 'rtl' : 'ltr'}>
+        <p className="follow-missing">{t('This real-phone lesson was not found.', 'یہ اصلی فون کا سبق نہیں ملا۔')}</p>
+        <button className="game-cta" onClick={onBack}>{t('Back to lessons', 'اسباق پر واپس')}</button>
+      </main>
     )
   }
 
   const totalSteps = lesson.steps.length
-  const step = lesson.steps[stepIndex]
   const progressPercent = Math.round(((stepIndex + 1) / totalSteps) * 100)
   const isLastStep = stepIndex >= totalSteps - 1
   const canLaunch = step?.action === 'launch-whatsapp'
   const nativeAndroid = isNativeAndroid()
+  const n = (v) => (ur ? String(v).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]) : String(v))
 
   const handleOpenWhatsApp = async () => {
     setLaunching(true)
@@ -79,296 +80,127 @@ export default function FollowAlongScreen({
   }
 
   const handleDone = () => {
+    stop()
     setCompleted(true)
     onLessonCompleted?.(lesson.id)
   }
 
-  const handleRepeat = () => {
-    setPaused(false)
-    setShowHelp(false)
-    setRepeatNotice(`Repeating step ${stepIndex + 1}: ${step.title.en}`)
-    stepCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    window.setTimeout(() => setRepeatNotice(''), 2500)
-  }
-
-  const goNext = () => {
-    setStepIndex((value) => Math.min(totalSteps - 1, value + 1))
-  }
-
-  const goPrevious = () => {
-    setStepIndex((value) => Math.max(0, value - 1))
-  }
-
-  if (completed) {
-    return (
-      <AppShell onBrandClick={onBack}>
-        <div className="mx-auto w-full max-w-3xl">
-          <PracticeBadge />
-          <Card className="mt-5 p-6 sm:p-8">
-            <div className="flex items-start gap-4">
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal text-ivory">
-                <CheckCircle2 className="h-8 w-8" aria-hidden="true" />
-              </span>
-              <div>
-                <h1 className="font-display text-3xl font-semibold text-forest">
-                  Practice marked complete
-                </h1>
-                <p className="mt-3 text-lg leading-relaxed text-ink/85">
-                  {lesson.completionMessage.en}
-                </p>
-                <p className="mt-2 text-lg text-forest" lang="ur" dir="auto">
-                  {lesson.completionMessage.ur}
-                </p>
-                <p className="mt-4 text-base text-forest-muted">
-                  Ustaad guides you, but you control your phone. No message content was collected.
-                </p>
-              </div>
-            </div>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                onClick={() => {
-                  setCompleted(false)
-                  setStepIndex(0)
-                  setPaused(false)
-                  setShowHelp(false)
-                  setLaunchStatus(null)
-                  setRepeatNotice('')
-                }}
-              >
-                <RotateCcw className="h-5 w-5" aria-hidden="true" />
-                Practise this lesson again
-              </Button>
-              <Button variant="secondary" onClick={onBack}>
-                Back to Dashboard
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </AppShell>
-    )
-  }
+  const goNext = () => setStepIndex((value) => Math.min(totalSteps - 1, value + 1))
+  const goPrevious = () => setStepIndex((value) => Math.max(0, value - 1))
 
   return (
-    <AppShell onBrandClick={onBack}>
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
-        <div>
-          <button
-            type="button"
-            onClick={onBack}
-            className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted hover:text-forest"
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-            Exit Follow-Along
-          </button>
+    <main className="game-world follow-game" dir={ur ? 'rtl' : 'ltr'}>
+      <div className="aurora aurora-one" /><div className="aurora aurora-two" /><div className="game-grid" />
+      <header className="game-nav dashboard-nav">
+        <button className="game-brand" onClick={() => { stop(); onBack() }}>
+          <span className="brand-orbit"><Gamepad2 size={25} /></span>
+          <span><b>Digital Ustaad</b><small>{t('On your real phone', 'آپ کے اصلی فون پر')}</small></span>
+        </button>
+        <div className="nav-stats"><ThemeToggle /><Language /></div>
+      </header>
 
-          <div className="mb-3 flex flex-wrap items-center gap-3">
-            <PracticeBadge />
-            <span className="rounded-full bg-sage px-3 py-1.5 text-sm font-semibold text-forest">
-              Practise on My Phone
-            </span>
-            <span className="rounded-full bg-teal-soft px-3 py-1.5 text-sm font-semibold text-forest">
-              English + Urdu shown together
-            </span>
-          </div>
-
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
-            {lesson.title.en}
-          </h1>
-          <p className="mt-2 text-lg text-forest" lang="ur" dir="auto">
-            {lesson.title.ur}
-          </p>
-          <p className="mt-3 text-lg leading-relaxed text-ink/85">
-            {lesson.description.en}
-          </p>
-          <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
-            {lesson.description.ur}
-          </p>
-        </div>
-
-        <Card className="border-teal/20 bg-teal-soft/70 p-5">
-          <p className="flex items-start gap-3 text-lg font-semibold text-forest">
-            <ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-teal" aria-hidden="true" />
-            Ustaad guides you, but you control your phone.
-          </p>
-          <p className="mt-2 text-base text-forest" lang="ur" dir="auto">
-            استاد رہنمائی کرتا ہے، فون آپ چلاتے ہیں۔
-          </p>
-        </Card>
-
-        <p className="sr-only" role="status" aria-live="polite">
-          {repeatNotice}
+      <div className="follow-wrap">
+        <p className="eyebrow">
+          <span className="real-badge">{t('REAL PHONE', 'اصلی فون')}</span>
+          {t('Ustaad only guides. You tap. Nothing is read or sent by this app.', 'استاد صرف بتاتا ہے۔ دباتے آپ ہیں۔ یہ ایپ کچھ نہیں پڑھتی اور نہیں بھیجتی۔')}
         </p>
+        <h1>{ur ? lesson.title.ur : lesson.title.en}</h1>
+        <p className="follow-lead">{ur ? lesson.description.ur : lesson.description.en}</p>
 
-        <div ref={stepCardRef}>
-        <Card className="p-5 sm:p-6">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="text-base font-semibold text-forest">
-              Step {stepIndex + 1} of {totalSteps}
-            </p>
-            <p className="text-sm font-medium text-forest-muted">{progressPercent}%</p>
-          </div>
-          <div
-            className="h-3 overflow-hidden rounded-full bg-sage"
-            role="progressbar"
-            aria-valuemin={1}
-            aria-valuemax={totalSteps}
-            aria-valuenow={stepIndex + 1}
-            aria-label={`Follow-Along step ${stepIndex + 1} of ${totalSteps}`}
-          >
-            <div
-              className="h-full rounded-full bg-teal transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-
-          {paused ? (
-            <div className="mt-6 rounded-2xl bg-sage/80 px-5 py-6">
-              <p className="font-display text-2xl font-semibold text-forest">Paused</p>
-              <p className="mt-2 text-lg text-ink/85">{lesson.pauseMessage.en}</p>
-              <p className="mt-1 text-lg text-forest" lang="ur" dir="auto">
-                {lesson.pauseMessage.ur}
-              </p>
-              <Button className="mt-5" onClick={() => setPaused(false)}>
-                <Play className="h-5 w-5" aria-hidden="true" />
-                Resume
-              </Button>
+        {completed ? (
+          <section className="follow-card follow-done">
+            <span className="results-medal gold"><CheckCircle2 size={44} /></span>
+            <h2>{t('You marked this practice complete.', 'آپ نے اس مشق کو مکمل قرار دیا۔')}</h2>
+            <p>{ur ? lesson.completionMessage.ur : lesson.completionMessage.en}</p>
+            <div className="results-actions">
+              <button className="game-cta" onClick={() => { stop(); onBack() }}>
+                <span>{t('Back to my lessons', 'اپنے اسباق پر واپس')}</span><Arrow size={20} />
+              </button>
+              <button className="lab-action" onClick={() => { setCompleted(false); setStepIndex(0); setPaused(false); setShowHelp(false); setLaunchStatus(null) }}>
+                <RotateCcw size={18} />{t('Practise this again', 'ایک بار پھر مشق')}
+              </button>
             </div>
-          ) : (
-            <div className="mt-6">
-              <h2 className="font-display text-2xl font-semibold text-forest sm:text-3xl">
-                {step.title.en}
-              </h2>
-              <p className="mt-1 text-xl text-forest" lang="ur" dir="auto">
-                {step.title.ur}
-              </p>
-              <p className="mt-4 text-lg leading-relaxed text-ink/90">
-                {step.instruction.en}
-              </p>
-              <p className="mt-2 text-lg leading-relaxed text-forest" lang="ur" dir="auto">
-                {step.instruction.ur}
-              </p>
+          </section>
+        ) : (
+          <>
+            <section className="follow-card" ref={stepCardRef}>
+              <div className="follow-progress-head">
+                <b>{t('Step', 'قدم')} {n(stepIndex + 1)} {t('of', 'از')} {n(totalSteps)}</b>
+                <span>{n(progressPercent)}%</span>
+              </div>
+              <div className="level-bar" role="progressbar" aria-valuemin={1} aria-valuemax={totalSteps} aria-valuenow={stepIndex + 1}>
+                <i style={{ width: `${progressPercent}%` }} />
+              </div>
 
-              {canLaunch && (
-                <div className="mt-5 space-y-3 rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
-                  <p className="flex items-center gap-2 text-base font-semibold text-forest">
-                    <Smartphone className="h-5 w-5 text-teal" aria-hidden="true" />
-                    {nativeAndroid
-                      ? 'Open WhatsApp on this phone'
-                      : 'Open WhatsApp on your phone'}
-                  </p>
-
-                  {!nativeAndroid && (
-                    <>
-                      <p className="text-base text-forest-muted">
-                        This web version cannot open WhatsApp for you. Open WhatsApp yourself on your phone, then come back here and tap Continue.
-                      </p>
-                      <p className="text-base text-forest-muted" lang="ur" dir="auto">
-                        یہ ویب ورژن واٹس ایپ خود نہیں کھول سکتا۔ فون پر واٹس ایپ خود کھولیں، پھر یہاں واپس آ کر Continue دبائیں۔
-                      </p>
-                    </>
-                  )}
-
-                  {nativeAndroid &&
-                    appAvailability &&
-                    !appAvailability.whatsapp &&
-                    !appAvailability.whatsappBusiness && (
-                      <p className="text-base text-forest-muted">
-                        WhatsApp does not appear to be installed. Install WhatsApp or WhatsApp Business, then try again.
-                      </p>
-                    )}
-
-                  {nativeAndroid && (
-                    <Button
-                      onClick={handleOpenWhatsApp}
-                      disabled={launching}
-                      className="w-full sm:w-auto"
-                    >
-                      <ExternalLink className="h-5 w-5" aria-hidden="true" />
-                      {launching ? 'Opening…' : 'Open WhatsApp'}
-                    </Button>
-                  )}
-
-                  {nativeAndroid && launchStatus && (
-                    <p className="text-base text-forest-muted" role="status">
-                      {launchStatus.opened
-                        ? `Opened ${launchStatus.app === 'com.whatsapp.w4b' ? 'WhatsApp Business' : 'WhatsApp'}. Continue the steps there, then return here.`
-                        : launchStatus.reason}
-                    </p>
-                  )}
+              {paused ? (
+                <div className="follow-pause">
+                  <h2>{t('Paused. Take a breath.', 'وقفہ۔ آرام سے سانس لیں۔')}</h2>
+                  <p>{ur ? lesson.pauseMessage.ur : lesson.pauseMessage.en}</p>
+                  <button className="game-cta" onClick={() => setPaused(false)}><Play size={18} /><span>{t('Resume', 'جاری رکھیں')}</span></button>
                 </div>
-              )}
+              ) : (
+                <>
+                  <h2>{ur ? step.title.ur : step.title.en}</h2>
+                  <p className="follow-instruction">{ur ? step.instruction.ur : step.instruction.en}</p>
 
-              {showHelp && (
-                <div
-                  className="mt-5 rounded-2xl bg-teal-soft/80 px-4 py-4"
-                  role="region"
-                  aria-label="Help"
-                >
-                  <p className="text-base font-semibold text-forest">I need help</p>
-                  <p className="mt-2 text-base text-ink">{step.help.en}</p>
-                  <p className="mt-1 text-base text-forest" lang="ur" dir="auto">
-                    {step.help.ur}
-                  </p>
-                  <p className="mt-3 text-sm text-forest-muted">{lesson.helpIntro.en}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </Card>
-        </div>
+                  {canLaunch && (
+                    <div className="follow-launch">
+                      <p><Smartphone size={20} /> {nativeAndroid ? t('Open WhatsApp on this phone', 'اس فون پر واٹس ایپ کھولیں') : t('Open WhatsApp on your phone yourself', 'اپنے فون پر واٹس ایپ خود کھولیں')}</p>
+                      {!nativeAndroid && (
+                        <small>{t('This web version cannot open WhatsApp for you. Open it yourself, then come back and tap Continue.', 'یہ ویب ورژن واٹس ایپ خود نہیں کھول سکتا۔ خود کھولیں، پھر واپس آ کر آگے بڑھیں۔')}</small>
+                      )}
+                      {nativeAndroid && appAvailability && !appAvailability.whatsapp && !appAvailability.whatsappBusiness && (
+                        <small>{t('WhatsApp does not appear to be installed. Install WhatsApp or WhatsApp Business, then try again.', 'واٹس ایپ نصب نہیں لگتی۔ واٹس ایپ یا واٹس ایپ بزنس انسٹال کر کے دوبارہ کوشش کریں۔')}</small>
+                      )}
+                      {nativeAndroid && (
+                        <button className="game-cta" onClick={handleOpenWhatsApp} disabled={launching}>
+                          <ExternalLink size={18} /><span>{launching ? t('Opening…', 'کھل رہا ہے…') : t('Open WhatsApp', 'واٹس ایپ کھولیں')}</span>
+                        </button>
+                      )}
+                      {nativeAndroid && launchStatus && (
+                        <small role="status">
+                          {launchStatus.opened
+                            ? t(`Opened ${launchStatus.app === 'com.whatsapp.w4b' ? 'WhatsApp Business' : 'WhatsApp'}. Continue the steps there, then return here.`, 'واٹس ایپ کھل گئی۔ وہاں قدم مکمل کر کے یہاں واپس آئیں۔')
+                            : launchStatus.reason}
+                        </small>
+                      )}
+                    </div>
+                  )}
 
-        {!paused && (
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Button
-              variant="secondary"
-              onClick={goPrevious}
-              disabled={stepIndex === 0}
-            >
-              Previous
-            </Button>
-            {isLastStep ? (
-              <Button onClick={handleDone}>
-                <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-                Done — I confirmed myself
-              </Button>
-            ) : (
-              <Button onClick={goNext}>
-                Continue
-              </Button>
+                  {showHelp && (
+                    <div className="context-hint" role="region" aria-label={t('Help', 'مدد')}>
+                      <p>{ur ? step.help.ur : step.help.en}</p>
+                      <small>{ur ? lesson.helpIntro.ur : lesson.helpIntro.en}</small>
+                    </div>
+                  )}
+                </>
+              )}
+            </section>
+
+            {!paused && (
+              <div className="follow-actions">
+                <button className="lab-action" onClick={goPrevious} disabled={stepIndex === 0}>{t('Previous', 'پچھلا')}</button>
+                {isLastStep
+                  ? <button className="game-cta" onClick={handleDone}><CheckCircle2 size={20} /><span>{t('Done — I confirmed myself', 'مکمل — میں نے خود تصدیق کی')}</span></button>
+                  : <button className="game-cta" onClick={goNext}><span>{t('Continue', 'آگے بڑھیں')}</span><Arrow size={18} /></button>}
+                <button className="lab-action" onClick={() => { setShowHelp(false); stepCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}><RotateCcw size={18} />{t('Repeat this step', 'یہ قدم دہرائیں')}</button>
+                <button className="lab-action" onClick={() => setShowHelp((value) => !value)}><CircleHelp size={18} />{showHelp ? t('Hide help', 'مدد چھپائیں') : t('I need help', 'مدد چاہیے')}</button>
+                <button className="lab-action" onClick={() => { stop(); setPaused(true) }}><Pause size={18} />{t('Pause', 'وقفہ')}</button>
+                <VoiceToggle />
+              </div>
             )}
-            <Button variant="secondary" onClick={handleRepeat}>
-              <RotateCcw className="h-5 w-5" aria-hidden="true" />
-              Repeat this step
-            </Button>
-            <Button variant="secondary" onClick={() => setShowHelp((value) => !value)}>
-              <CircleHelp className="h-5 w-5" aria-hidden="true" />
-              {showHelp ? 'Hide help' : 'I need help'}
-            </Button>
-            <Button variant="ghost" onClick={() => setPaused(true)}>
-              <Pause className="h-5 w-5" aria-hidden="true" />
-              Pause
-            </Button>
-            <Button variant="ghost" onClick={onBack}>
-              <X className="h-5 w-5" aria-hidden="true" />
-              Exit
-            </Button>
-          </div>
-        )}
 
-        <Card className="p-5">
-          <h2 className="font-display text-xl font-semibold text-forest">Safety reminders</h2>
-          <ul className="mt-3 space-y-3">
-            {lesson.safetyNotes.map((note) => (
-              <li key={note.en} className="rounded-2xl bg-sage/70 px-4 py-3">
-                <p className="text-base text-forest">{note.en}</p>
-                <p className="mt-1 text-base text-forest-muted" lang="ur" dir="auto">
-                  {note.ur}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Card>
+            <section className="follow-safety">
+              <h3><ShieldCheck size={20} /> {t('Safety reminders', 'حفاظتی یاد دہانی')}</h3>
+              <ul>
+                {lesson.safetyNotes.map((note) => (
+                  <li key={note.en}>{ur ? note.ur : note.en}</li>
+                ))}
+              </ul>
+            </section>
+          </>
+        )}
       </div>
-    </AppShell>
+    </main>
   )
 }

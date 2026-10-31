@@ -1,3 +1,13 @@
+export const LESSON_POINTS = {
+  'share-family-photo': 100,
+  'whatsapp-voice-message': 120,
+  'scam-safety': 150,
+}
+export const STAGE_SIZE = 200
+export const DAILY_BONUS = 50
+export const HELLO_BONUS = 20
+export const FOLLOW_ALONG_BONUS = 30
+
 export const DEFAULT_PROGRESS = {
   version: 4,
   masteredIds: [],
@@ -8,6 +18,13 @@ export const DEFAULT_PROGRESS = {
   latestIndependentResult: null,
   followAlongStarted: false,
   followAlongCompletedLessonIds: [],
+  // ISO day keys (YYYY-MM-DD) on which the learner practised; drives the real streak.
+  practiceDays: [],
+  // Best points kept per lesson, so replaying cannot farm an unlimited score.
+  lessonScores: {},
+  // Days on which a lesson was actually finished. Each day adds DAILY_BONUS once.
+  dailyBonusDays: [],
+  helloBonus: false,
   // legacy-compatible flags used by older UI copy paths
   shareFamilyPhotoStarted: false,
   guidedCompleted: false,
@@ -28,6 +45,56 @@ export const COMPLETED_STEPS = [
 function sanitizeIds(raw) {
   if (!Array.isArray(raw)) return []
   return [...new Set(raw.filter((id) => typeof id === 'string' && id.trim()))]
+}
+
+function sanitizeDays(raw) {
+  return sanitizeIds(raw).filter((day) => /^\d{4}-\d{2}-\d{2}$/.test(day)).sort()
+}
+
+// Guided finish is a start. Doing it alone is worth more. A clean solo finish earns the full lesson.
+export function pointsForResult(result) {
+  if (!result?.completed) return 0
+  const max = LESSON_POINTS[result.lessonId] || 0
+  if (!max) return 0
+  const clean = result.mode === 'independent' && result.completedWithoutAssistance && (result.incorrectAttempts || 0) === 0
+  if (clean) return max
+  if (result.mode === 'independent') return Math.round(max * 0.7)
+  return Math.round(max * 0.4)
+}
+
+function sanitizeScores(raw, guided, independent, mastered) {
+  const stored = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {}
+  const scores = {}
+  for (const [id, max] of Object.entries(LESSON_POINTS)) {
+    const saved = Number(stored[id])
+    let best = Number.isFinite(saved) ? Math.max(0, Math.min(max, saved)) : 0
+    if (guided.includes(id)) best = Math.max(best, Math.round(max * 0.4))
+    if (independent.includes(id)) best = Math.max(best, Math.round(max * 0.7))
+    if (mastered.includes(id)) best = max
+    if (best) scores[id] = best
+  }
+  return scores
+}
+
+export function totalPoints(progress) {
+  const data = progress?.lessonScores ? progress : normalizeProgress(progress)
+  const lessons = Object.values(data.lessonScores || {}).reduce((sum, value) => sum + value, 0)
+  const daily = (data.dailyBonusDays?.length || 0) * DAILY_BONUS
+  const hello = data.helloBonus ? HELLO_BONUS : 0
+  const realPhone = data.followAlongCompletedLessonIds?.length ? FOLLOW_ALONG_BONUS : 0
+  return lessons + daily + hello + realPhone
+}
+
+export function withResultRewards(progress, result, today) {
+  const current = normalizeProgress(progress)
+  const lessonId = result?.lessonId
+  const earned = pointsForResult(result)
+  const lessonScores = { ...current.lessonScores }
+  if (lessonId && earned) lessonScores[lessonId] = Math.max(lessonScores[lessonId] || 0, earned)
+  const dailyBonusDays = today && !current.dailyBonusDays.includes(today)
+    ? [...current.dailyBonusDays, today].sort()
+    : current.dailyBonusDays
+  return { ...current, lessonScores, dailyBonusDays }
 }
 
 function sanitizeResult(raw) {
@@ -69,6 +136,7 @@ export function normalizeProgress(raw) {
       (raw.independentCompleted ? ['share-family-photo'] : []),
   )
   const followAlongCompletedLessonIds = sanitizeIds(raw.followAlongCompletedLessonIds)
+  const masteredIds = sanitizeIds(raw.masteredIds)
   const lessonsStarted = Boolean(
     raw.lessonsStarted ||
       raw.shareFamilyPhotoStarted ||
@@ -80,7 +148,7 @@ export function normalizeProgress(raw) {
 
   return {
     version: 4,
-    masteredIds: sanitizeIds(raw.masteredIds),
+    masteredIds,
     lessonsStarted,
     guidedCompletedIds,
     independentCompletedIds,
@@ -88,6 +156,10 @@ export function normalizeProgress(raw) {
     latestIndependentResult: sanitizeResult(raw.latestIndependentResult),
     followAlongStarted: Boolean(raw.followAlongStarted || followAlongCompletedLessonIds.length),
     followAlongCompletedLessonIds,
+    practiceDays: sanitizeDays(raw.practiceDays),
+    lessonScores: sanitizeScores(raw.lessonScores, guidedCompletedIds, independentCompletedIds, masteredIds),
+    dailyBonusDays: sanitizeDays(raw.dailyBonusDays),
+    helloBonus: Boolean(raw.helloBonus),
     shareFamilyPhotoStarted: lessonsStarted,
     guidedCompleted: guidedCompletedIds.length > 0,
     independentCompleted: independentCompletedIds.length > 0,

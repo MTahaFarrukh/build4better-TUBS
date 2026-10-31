@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
+import { Download } from 'lucide-react'
+import { useLanguage } from '../../hooks/useLanguage'
 export default function Install() {
+  const { t } = useLanguage()
   const [update, setUpdate] = useState(false)
   const [prompt, setPrompt] = useState(null)
   const [help, setHelp] = useState(false)
@@ -13,5 +16,11 @@ export default function Install() {
     window.addEventListener('beforeinstallprompt', capture); window.addEventListener('appinstalled', done)
     return () => { window.removeEventListener('ustaad-update-ready', ready); window.removeEventListener('beforeinstallprompt', capture); window.removeEventListener('appinstalled', done) }
   }, [])
-  return <div>{update && <p role="status">An update is ready. Close all Ustaad windows and reopen when your practice is finished. · نئی تبدیلی کے لیے مشق کے بعد ایپ بند کر کے دوبارہ کھولیں۔</p>}<button className="journey-link" onClick={async () => { if (prompt) { await prompt.prompt(); setPrompt(null) } else setHelp(!help) }}>{installed ? 'Installed · انسٹال ہے' : 'Keep Ustaad on your phone · انسٹال کریں'}</button>{help && <p className="install-help">iPhone / iPad: Safari → Share → Add to Home Screen.<br/>Android: Chrome menu → Install app / Add to Home screen.<br/>Open once online to prepare offline practice. · پہلے ایک بار انٹرنیٹ کے ساتھ کھولیں۔</p>}</div>
+  return <div className="install-control">
+    {update && <p role="status">{t('An update is ready. Reopen the app after practice.', 'نئی تبدیلی تیار ہے۔ مشق کے بعد ایپ دوبارہ کھولیں۔')}</p>}
+    <button onClick={async () => { if (prompt) { await prompt.prompt(); setPrompt(null) } else setHelp(!help) }}>
+      <Download size={15} />{installed ? t('App installed', 'ایپ انسٹال ہے') : t('Install app', 'ایپ انسٹال کریں')}
+    </button>
+    {help && <p className="install-help">{t('iPhone: Safari → Share → Add to Home Screen. Android: Chrome menu → Install app.', 'آئی فون: سفاری → شیئر → ہوم اسکرین میں شامل کریں۔ اینڈرائیڈ: کروم مینیو → ایپ انسٹال کریں۔')}</p>}
+  </div>
 }

@@ -46,7 +46,7 @@ export const WHATSAPP_VOICE_MESSAGE_LESSON = {
       },
       instruction: {
         en: 'Open WhatsApp on your phone yourself. Then return to this page and tap Continue.',
-        ur: 'اپنے فون پر واٹس ایپ خود کھولیں۔ پھر اس صفحے پر واپس آ کر Continue دبائیں۔',
+        ur: 'اپنے فون پر واٹس ایپ خود کھولیں۔ پھر اس صفحے پر واپس آ کر «آگے بڑھیں» دبائیں۔',
       },
       help: {
         en: 'Look for the green WhatsApp icon. WhatsApp Business also works if that is what your family uses.',

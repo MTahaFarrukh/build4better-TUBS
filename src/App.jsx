@@ -8,9 +8,15 @@ import PracticeLabScreen from './screens/PracticeLabScreen'
 import FollowAlongScreen from './screens/FollowAlongScreen'
 import { DEFAULT_FOLLOW_ALONG_LESSON_ID } from './data/followAlong'
 import { LESSON_IDS } from './data/interactiveLessons'
-import { DEFAULT_PROGRESS, normalizeProgress } from './data/progress'
+import { DEFAULT_PROGRESS, normalizeProgress, withResultRewards } from './data/progress'
 import { PRACTICE_MODES } from './hooks/usePracticePhone'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { todayKey, useTheme } from './hooks/usePreference'
+
+const withToday = (current) => {
+  const today = todayKey()
+  return current.practiceDays.includes(today) ? current.practiceDays : [...current.practiceDays, today]
+}
 
 const VIEWS = {
   welcome: 'welcome',
@@ -21,6 +27,7 @@ const VIEWS = {
 
 export default function App() {
   const reduceMotion = useReducedMotion()
+  useTheme() // applies data-theme to <html> on first paint
   const migratedProgress = useRef(false)
   const [view, setView] = useLocalStorage('digital-ustaad:view', VIEWS.welcome)
   const [rawProgress, setRawProgress] = useLocalStorage(
@@ -62,15 +69,15 @@ export default function App() {
 
   const goToDashboard = () => setView(VIEWS.dashboard)
   const goToWelcome = () => setView(VIEWS.welcome)
+  const markHello = () => setRawProgress((prev) => ({ ...normalizeProgress(prev), helloBonus: true }))
 
   const startLab = (lessonId, mode) => {
     setActiveLessonId(lessonId)
     setPracticeMode(mode)
-    setRawProgress((prev) => ({
-      ...normalizeProgress(prev),
-      lessonsStarted: true,
-      [`${lessonId}Started`]: true,
-    }))
+    setRawProgress((prev) => {
+      const current = normalizeProgress(prev)
+      return { ...current, lessonsStarted: true, practiceDays: withToday(current), [`${lessonId}Started`]: true }
+    })
     setView(VIEWS.lab)
   }
 
@@ -94,16 +101,17 @@ export default function App() {
       const list = current[key].includes(lessonId)
         ? current[key]
         : [...current[key], lessonId]
-      return {
+      return withResultRewards({
         ...current,
         lessonsStarted: true,
+        practiceDays: withToday(current),
         [key]: list,
         masteredIds: resultSummary?.mode === 'independent' && resultSummary.completedWithoutAssistance && resultSummary.incorrectAttempts === 0 ? [...new Set([...(current.masteredIds || []), lessonId])] : (current.masteredIds || []),
         latestResult: resultSummary,
         ...(resultSummary?.mode === PRACTICE_MODES.independent
           ? { latestIndependentResult: resultSummary }
           : {}),
-      }
+      }, resultSummary, todayKey())
     })
   }
 
@@ -113,7 +121,7 @@ export default function App() {
       const ids = current.followAlongCompletedLessonIds.includes(lessonId)
         ? current.followAlongCompletedLessonIds
         : [...current.followAlongCompletedLessonIds, lessonId]
-      return { ...current, followAlongStarted: true, followAlongCompletedLessonIds: ids }
+      return { ...current, followAlongStarted: true, practiceDays: withToday(current), followAlongCompletedLessonIds: ids }
     })
   }
 
@@ -152,7 +160,7 @@ export default function App() {
         className="min-h-screen"
       >
         {safeView === VIEWS.welcome ? (
-          <WelcomeScreen onStart={goToDashboard} />
+          <WelcomeScreen onStart={goToDashboard} progress={progress} onHello={markHello} />
         ) : safeView === VIEWS.dashboard ? (
           <DashboardScreen
             onBack={goToWelcome}

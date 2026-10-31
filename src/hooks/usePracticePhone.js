@@ -210,8 +210,8 @@ function reducer(state, action) {
       return wrong(
         state,
         buildHint(
-          `${action.label} is only for practice decoration. Use the highlighted app for this lesson.`,
-          `${action.label} صرف دکھانے کے لیے ہے۔ اس سبق کا نمایاں ایپ استعمال کریں۔`,
+          'That icon is only for practice decoration. Use the highlighted app for this lesson.',
+          'یہ صرف دکھانے کے لیے ہے۔ اس سبق کا نمایاں ایپ استعمال کریں۔',
         ),
       )
 
