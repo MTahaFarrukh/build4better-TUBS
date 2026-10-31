@@ -2,86 +2,40 @@
 
 **Team TUBS · Build4Better 2026**
 
-Digital Ustaad is an interactive, accessible smartphone practice app that helps Pakistani parents and grandparents learn everyday digital tasks independently — starting with sharing a family photo.
+Digital Ustaad is a practice app for Pakistani parents and grandparents who did not grow up with smartphones. It teaches everyday phone tasks in simple English and Urdu. The learner does the steps. The app does not do the task for them.
 
-## Problem
+## Target user and problem
 
-Many older adults want to stay connected with family on smartphones, but everyday actions (opening Gallery, choosing a photo, sharing it) can feel confusing or risky. Learning on a real phone can feel stressful, and learners worry about sending something by mistake.
+The people this is for are parents and grandparents, especially around age 50 and older. Everyday actions feel risky: sending a photo, a WhatsApp voice note, a video call, a bill payment, or a message that might be a scam. When they get stuck, they call their children. Many avoid the tools that would help them because they are afraid of breaking something or looking foolish.
 
-## Solution
+## Solution and core features
 
-Digital Ustaad provides a calm **practice-only smartphone simulator** with:
+Digital Ustaad is a practice phone plus short lessons. A lesson can be done with Ustaad (step by step) or alone. Points, streak, and lesson progress are saved on that phone only. There is no account and no server.
 
-- Large, readable text and touch-friendly controls
-- Guided Practice with simple English + Urdu steps
-- Independent Practice without the guide
-- Clear results for each practice attempt
-- Progress saved only on the learner’s device (LocalStorage)
+Lessons:
 
-Nothing real is sent. Contacts and photos are fictional practice assets.
+1. Share a family photo — open Gallery, choose a practice photo, share it with a fictional family contact.
+2. Send a voice message — open WhatsApp, open a chat, hold the mic, release to send.
+3. Send a short reply — open Ammi’s chat and send «جی، ٹھیک ہے».
+4. Make a video call — call Beti on the practice phone, then hang up.
+5. Spot a fake message — prize, “new number, send money”, and parcel-fee messages.
+6. Call the saved number — when a new number asks for money or a code, call the number already saved.
+7. Leave a suspicious link — do not open it and do not forward it.
+8. Pay a bill safely — check the name and the amount, and refuse a message that asks for the PIN.
 
-## Target audience
+Also included:
 
-Pakistani parents and grandparents (especially ages 50+) who want patient, private practice before trying the same steps on their own phone.
+- English and real Urdu, including right-to-left layout
+- Spoken Urdu from recordings shipped with the app, and English from the phone’s own voice
+- Easy (light, larger type) and dark themes
+- A results screen with plain-language confidence, plus a way to tell family on WhatsApp
+- A separate real-phone guide for a WhatsApp voice note on Android. The guide can open WhatsApp. It never reads chats or checks that a message was sent
+- Installable website (PWA) so lessons and Urdu recordings open again without internet after the first visit
+- An Android shell with Capacitor for that real-phone guide
 
-## Features
+Practice lessons use fictional people, photos, bills, and messages. Nothing real is sent, paid, or called.
 
-- Welcome / onboarding screen
-- Learning dashboard with Guided and Independent Practice
-- Android-style practice phone (home, Gallery, Share sheet)
-- Six fictional illustrated gallery photos
-- Fictional contacts: Ammi, Abu, Beti, Family Group
-- Guided overlay with highlights and gentle tips (EN + Urdu)
-- Independent Practice mode (no guide overlays)
-- Results screen with transparent practice-attempt notes
-- Reset this attempt / Reset saved progress (with confirmation)
-- Practice-only safety messaging throughout
-
-### Screenshots
-
-Add screenshots here before final submission:
-
-1. Welcome screen  
-2. Dashboard with Guided + Independent Practice  
-3. Practice phone Gallery  
-4. Share sheet with practice contacts  
-5. Results screen  
-
-Suggested filenames: `docs/screenshots/welcome.png`, `dashboard.png`, `gallery.png`, `share.png`, `results.png`.
-
-## Tech stack
-
-- React (JavaScript)
-- Vite
-- Tailwind CSS v4
-- Lucide React
-- Framer Motion
-- LocalStorage (no backend)
-- Capacitor 7 (Android foundation)
-- Custom Android plugin: WhatsApp launcher (`com.whatsapp` / `com.whatsapp.w4b`)
-
-## Android (Follow-Along)
-
-Follow-Along mode (**Practise on My Phone**) guides a real WhatsApp voice-message lesson. Digital Ustaad never reads chats or verifies messages — the learner confirms completion.
-
-Requires JDK 21+ and Android Studio/SDK to build the APK.
-
-```bash
-npm install
-npm run cap:sync:android
-npx cap open android
-```
-
-On a physical device with USB debugging:
-
-```bash
-adb devices
-npm run cap:sync:android
-cd android
-.\gradlew.bat installDebug
-```
-
-## Installation and local setup
+## Setup and run
 
 ```bash
 npm install
@@ -90,41 +44,70 @@ npm run dev
 
 Open the URL shown in the terminal (usually `http://localhost:5173`).
 
-Other useful commands:
-
 ```bash
 npm run lint
 npm run build
 npm run preview
 ```
 
+`npm run build` also writes the offline service worker.
+
+Android follow-along needs JDK 21+ and Android Studio:
+
+```bash
+npm install
+npm run cap:sync:android
+npx cap open android
+```
+
+On a phone with USB debugging:
+
+```bash
+adb devices
+npm run cap:sync:android
+cd android
+.\gradlew.bat installDebug
+```
+
+## Technology stack
+
+- React 18 and Vite 6
+- Tailwind CSS v4
+- Framer Motion
+- Lucide React
+- LocalStorage for language, theme, voice, and progress
+- Capacitor 7 and a small Android plugin that opens WhatsApp or WhatsApp Business
+- A production service worker for offline use on the web
+
+Dependencies are listed in `package.json`.
+
 ## AI tools and third-party credits
 
-- **Cursor** — AI-assisted coding during the hackathon build window
-- **Vite / React / Tailwind / Lucide / Framer Motion** — open-source libraries as listed in `package.json`
-- Gallery images are original SVG illustrations created for this project (not real photographs)
+- **Cursor** — AI assistance for coding, debugging, and this README during the build
+- **React, Vite, Tailwind CSS, Framer Motion, Lucide, Capacitor** — open-source libraries
+- **Google Fonts** — Lexend and Noto Nastaliq Urdu, loaded in the browser
+- **Google Translate speech** — used once, while building, to record the Urdu lines saved in `public/voice/ur`. The running app plays those files. It does not call Google during a lesson
+- Gallery pictures are original SVG illustrations made for this project
 
-## Limitations and simulated functionality
+## Limitations
 
-- Simulator Gallery/Share uses fictional photos and contacts only
-- Simulator Share / Confirm never sends messages or calls external APIs
-- Follow-Along can open WhatsApp on Android, but the learner performs every real action
-- Digital Ustaad does **not** verify that a WhatsApp message was sent
-- No Floating Ustaad overlay, AccessibilityService, or automatic taps in this phase
-- Progress metrics describe practice on this device only — not real-world digital literacy
-- “Coming soon” lessons on the dashboard are placeholders
-- Browser preview cannot natively launch WhatsApp
+- Lessons are practice. They do not send a real message, place a real call, or move real money
+- The real-phone WhatsApp guide opens the app only. The learner does every step and confirms when they are done
+- The website cannot open WhatsApp by itself. That launch exists in the Android app
+- Progress stays on one browser or installed app. Clearing site data removes it. There is no login and no shared family dashboard
+- Urdu speech is the shipped recordings. A changed Urdu sentence needs a new recording (`node scripts/build-urdu-voice.mjs`)
+- English speech uses whatever English voice the phone already has
+- The first visit needs internet to download the app and the fonts. After a home-screen install, lessons and Urdu audio work offline. Fonts may fall back to the phone’s own type
+- There is no lesson for a banking app signing the user out, or for a government form
 
 ## Team
 
 **TUBS** — Build4Better 2026
 
-## Demo script
-
-See [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md) for a concise under-2-minute video narration.
+Names recorded in this repository’s history: MTahaFarrukh, UzairAhmed87, and sjameel06.
 
 ## Submitted commit
 
-Final submitted commit identifier: `REPLACE_WITH_FINAL_COMMIT_SHA`
+Final submitted commit identifier: `PENDING_FINAL_COMMIT`
 
-After your last commit, run `git rev-parse --short HEAD` and replace the placeholder above.
+That commit contains the app and this README. The commit after it only writes this identifier.
