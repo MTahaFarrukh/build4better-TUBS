@@ -1,9 +1,11 @@
 export const DEFAULT_PROGRESS = {
-  version: 2,
+  version: 3,
   shareFamilyPhotoStarted: false,
   guidedCompleted: false,
   independentCompleted: false,
   latestIndependentResult: null,
+  followAlongStarted: false,
+  followAlongCompletedLessonIds: [],
 }
 
 export const COMPLETED_STEPS = [
@@ -36,8 +38,13 @@ function sanitizeResult(raw) {
   }
 }
 
+function sanitizeLessonIds(raw) {
+  if (!Array.isArray(raw)) return []
+  return [...new Set(raw.filter((id) => typeof id === 'string' && id.trim()))]
+}
+
 export function normalizeProgress(raw) {
-  if (!raw || typeof raw !== 'object') {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return { ...DEFAULT_PROGRESS }
   }
 
@@ -45,32 +52,50 @@ export function normalizeProgress(raw) {
     raw.guidedCompleted || raw.shareFamilyPhotoCompleted,
   )
   const independentCompleted = Boolean(raw.independentCompleted)
+  const followAlongCompletedLessonIds = sanitizeLessonIds(
+    raw.followAlongCompletedLessonIds,
+  )
+  const followAlongStarted = Boolean(
+    raw.followAlongStarted || followAlongCompletedLessonIds.length > 0,
+  )
   const started = Boolean(
-    raw.shareFamilyPhotoStarted || guidedCompleted || independentCompleted,
+    raw.shareFamilyPhotoStarted ||
+      guidedCompleted ||
+      independentCompleted ||
+      followAlongStarted,
   )
 
   return {
-    version: 2,
+    version: 3,
     shareFamilyPhotoStarted: started,
     guidedCompleted,
     independentCompleted,
     latestIndependentResult: sanitizeResult(raw.latestIndependentResult),
+    followAlongStarted,
+    followAlongCompletedLessonIds,
   }
 }
 
 export function getProgressPercent(progress) {
   const data = normalizeProgress(progress)
-  if (data.independentCompleted) return 100
+  if (data.followAlongCompletedLessonIds.length > 0 && data.independentCompleted) {
+    return 100
+  }
+  if (data.independentCompleted) return 90
+  if (data.followAlongCompletedLessonIds.length > 0) return 80
   if (data.guidedCompleted) return 65
-  if (data.shareFamilyPhotoStarted) return 30
+  if (data.shareFamilyPhotoStarted || data.followAlongStarted) return 30
   return 0
 }
 
 export function getProgressLabel(progress) {
   const data = normalizeProgress(progress)
+  if (data.followAlongCompletedLessonIds.length > 0) {
+    return 'Follow-Along practice completed'
+  }
   if (data.independentCompleted) return 'Independent practice completed'
   if (data.guidedCompleted) return 'Guided practice completed'
-  if (data.shareFamilyPhotoStarted) return 'Practice started'
+  if (data.shareFamilyPhotoStarted || data.followAlongStarted) return 'Practice started'
   return 'Ready to begin'
 }
 

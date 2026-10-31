@@ -6,11 +6,13 @@ import {
   ImagePlus,
   Lock,
   RotateCcw,
+  Smartphone,
   Sparkles,
 } from 'lucide-react'
 import AppShell from '../components/layout/AppShell'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import { WHATSAPP_VOICE_MESSAGE_LESSON } from '../data/followAlong'
 import { COMING_SOON_LESSONS, FLAGSHIP_LESSON } from '../data/lessons'
 import {
   formatDuration,
@@ -23,8 +25,12 @@ export default function DashboardScreen({
   progress,
   onStartGuided,
   onStartIndependent,
+  onStartFollowAlong,
   onResetProgress,
 }) {
+  const followAlongDone = progress?.followAlongCompletedLessonIds?.includes(
+    WHATSAPP_VOICE_MESSAGE_LESSON.id,
+  )
   const progressPercent = getProgressPercent(progress)
   const progressLabel = getProgressLabel(progress)
   const latest = progress?.latestIndependentResult
@@ -53,10 +59,10 @@ export default function DashboardScreen({
             Your learning space
           </h1>
           <p className="mt-2 max-w-2xl text-lg leading-relaxed text-ink/80">
-            Learn with guidance first, then try Independent Practice on the same safe phone.
+            Practise in the simulator, then follow along on your real phone — you stay in control.
           </p>
           <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
-            پہلے رہنمائی کے ساتھ سیکھیں، پھر خود مشق کریں۔
+            پہلے سیمولیٹر میں مشق کریں، پھر اپنے حقیقی فون پر قدم بہ قدم چلیں۔
           </p>
         </div>
       </div>
@@ -129,6 +135,48 @@ export default function DashboardScreen({
               </div>
             </div>
           </Card>
+
+          <Card className="mt-6 overflow-hidden p-0">
+            <div className="grid md:grid-cols-[0.85fr_1.15fr]">
+              <div className="bg-gradient-to-br from-teal to-forest p-6 text-ivory">
+                <span className="inline-flex items-center gap-2 rounded-full bg-ivory/15 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em]">
+                  <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
+                  Follow-Along
+                </span>
+                <h2 className="font-display mt-5 text-3xl font-semibold leading-tight">
+                  Practise on My Phone
+                </h2>
+                <p className="mt-3 text-base text-ivory/85">
+                  Real phone steps. You do every action yourself.
+                </p>
+              </div>
+              <div className="flex flex-col justify-between gap-5 p-6 sm:p-8">
+                <div>
+                  <h3 className="font-display text-2xl font-semibold text-forest">
+                    {WHATSAPP_VOICE_MESSAGE_LESSON.title.en}
+                  </h3>
+                  <p className="mt-1 text-lg text-forest" lang="ur" dir="auto">
+                    {WHATSAPP_VOICE_MESSAGE_LESSON.title.ur}
+                  </p>
+                  <p className="mt-3 text-base leading-relaxed text-ink/85">
+                    {WHATSAPP_VOICE_MESSAGE_LESSON.description.en}
+                  </p>
+                  <p className="mt-3 rounded-2xl bg-sage/80 px-4 py-3 text-base font-semibold text-forest">
+                    Ustaad guides you, but you control your phone.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Button onClick={onStartFollowAlong} className="w-full sm:w-fit">
+                    <Smartphone className="h-5 w-5" aria-hidden="true" />
+                    {followAlongDone ? 'Practise on My Phone again' : 'Practise on My Phone'}
+                  </Button>
+                  <p className="text-base text-forest-muted">
+                    Digital Ustaad never reads chats or verifies a real message. You confirm completion yourself.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.aside
@@ -140,13 +188,15 @@ export default function DashboardScreen({
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Your progress</h2>
             <p className="mt-2 text-base leading-relaxed text-ink/75">
-              {progress.independentCompleted
-                ? 'You finished Independent Practice on this device. You can practise again anytime.'
-                : progress.guidedCompleted
-                  ? 'Guided practice is saved. Try Independent Practice when you feel ready.'
-                  : progress.shareFamilyPhotoStarted
-                    ? 'You started the photo-sharing lesson. Continue whenever you like.'
-                    : 'No practice saved yet. Start with Guided Practice.'}
+              {followAlongDone
+                ? 'You marked a Follow-Along phone lesson complete. Simulator practice is still available anytime.'
+                : progress.independentCompleted
+                  ? 'You finished Independent Practice on this device. You can practise again anytime.'
+                  : progress.guidedCompleted
+                    ? 'Guided practice is saved. Try Independent Practice or Practise on My Phone when ready.'
+                    : progress.shareFamilyPhotoStarted || progress.followAlongStarted
+                      ? 'You started practice on this device. Continue whenever you like.'
+                      : 'No practice saved yet. Start with Guided Practice or Practise on My Phone.'}
             </p>
             <p className="mt-2 text-sm text-forest-muted">
               Progress here only tracks practice on this device — not real-world phone skill.

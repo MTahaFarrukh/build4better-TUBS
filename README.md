@@ -57,6 +57,29 @@ Suggested filenames: `docs/screenshots/welcome.png`, `dashboard.png`, `gallery.p
 - Lucide React
 - Framer Motion
 - LocalStorage (no backend)
+- Capacitor 7 (Android foundation)
+- Custom Android plugin: WhatsApp launcher (`com.whatsapp` / `com.whatsapp.w4b`)
+
+## Android (Follow-Along)
+
+Follow-Along mode (**Practise on My Phone**) guides a real WhatsApp voice-message lesson. Digital Ustaad never reads chats or verifies messages — the learner confirms completion.
+
+Requires JDK 21+ and Android Studio/SDK to build the APK.
+
+```bash
+npm install
+npm run cap:sync:android
+npx cap open android
+```
+
+On a physical device with USB debugging:
+
+```bash
+adb devices
+npm run cap:sync:android
+cd android
+.\gradlew.bat installDebug
+```
 
 ## Installation and local setup
 
@@ -83,12 +106,14 @@ npm run preview
 
 ## Limitations and simulated functionality
 
-- This is a **simulator**, not a bridge to a real phone OS
-- Gallery photos are fictional illustrations
-- Contacts are fictional and never connected to a real address book
-- Share / Confirm never sends messages, uploads files, or calls external APIs
-- Progress metrics describe a practice attempt only — they do **not** prove real-world digital literacy
+- Simulator Gallery/Share uses fictional photos and contacts only
+- Simulator Share / Confirm never sends messages or calls external APIs
+- Follow-Along can open WhatsApp on Android, but the learner performs every real action
+- Digital Ustaad does **not** verify that a WhatsApp message was sent
+- No Floating Ustaad overlay, AccessibilityService, or automatic taps in this phase
+- Progress metrics describe practice on this device only — not real-world digital literacy
 - “Coming soon” lessons on the dashboard are placeholders
+- Browser preview cannot natively launch WhatsApp
 
 ## Team
 

@@ -4,6 +4,10 @@ import AppShell from './components/layout/AppShell'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import LessonSimulatorScreen from './screens/LessonSimulatorScreen'
+import FollowAlongScreen from './screens/FollowAlongScreen'
+import {
+  DEFAULT_FOLLOW_ALONG_LESSON_ID,
+} from './data/followAlong'
 import { DEFAULT_PROGRESS, normalizeProgress } from './data/progress'
 import { PRACTICE_MODES } from './hooks/useSimulator'
 import { useLocalStorage } from './hooks/useLocalStorage'
@@ -12,6 +16,7 @@ const VIEWS = {
   welcome: 'welcome',
   dashboard: 'dashboard',
   simulator: 'simulator',
+  followAlong: 'follow-along',
 }
 
 export default function App() {
@@ -26,6 +31,10 @@ export default function App() {
     'digital-ustaad:practice-mode',
     PRACTICE_MODES.guided,
   )
+  const [followAlongLessonId, setFollowAlongLessonId] = useLocalStorage(
+    'digital-ustaad:follow-along-lesson',
+    DEFAULT_FOLLOW_ALONG_LESSON_ID,
+  )
 
   const progress = useMemo(
     () => normalizeProgress(rawProgress),
@@ -39,7 +48,7 @@ export default function App() {
       !rawProgress ||
       typeof rawProgress !== 'object' ||
       Array.isArray(rawProgress) ||
-      rawProgress.version !== 2 ||
+      rawProgress.version !== 3 ||
       Object.prototype.hasOwnProperty.call(rawProgress, 'shareFamilyPhotoCompleted')
 
     migratedProgress.current = true
@@ -60,6 +69,15 @@ export default function App() {
     setView(VIEWS.simulator)
   }
 
+  const startFollowAlong = (lessonId = DEFAULT_FOLLOW_ALONG_LESSON_ID) => {
+    setFollowAlongLessonId(lessonId)
+    setRawProgress((prev) => ({
+      ...normalizeProgress(prev),
+      followAlongStarted: true,
+    }))
+    setView(VIEWS.followAlong)
+  }
+
   const handleGuidedCompleted = () => {
     setRawProgress((prev) => ({
       ...normalizeProgress(prev),
@@ -77,10 +95,25 @@ export default function App() {
     }))
   }
 
+  const handleFollowAlongCompleted = (lessonId) => {
+    setRawProgress((prev) => {
+      const current = normalizeProgress(prev)
+      const ids = current.followAlongCompletedLessonIds.includes(lessonId)
+        ? current.followAlongCompletedLessonIds
+        : [...current.followAlongCompletedLessonIds, lessonId]
+      return {
+        ...current,
+        followAlongStarted: true,
+        followAlongCompletedLessonIds: ids,
+      }
+    })
+  }
+
   const handleResetProgress = () => {
     setRawProgress({ ...DEFAULT_PROGRESS })
     setPracticeMode(PRACTICE_MODES.guided)
-    if (view === VIEWS.simulator) {
+    setFollowAlongLessonId(DEFAULT_FOLLOW_ALONG_LESSON_ID)
+    if (view === VIEWS.simulator || view === VIEWS.followAlong) {
       setView(VIEWS.dashboard)
     }
   }
@@ -93,7 +126,13 @@ export default function App() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={safeView === VIEWS.simulator ? `${safeView}-${safeMode}` : safeView}
+        key={
+          safeView === VIEWS.simulator
+            ? `${safeView}-${safeMode}`
+            : safeView === VIEWS.followAlong
+              ? `${safeView}-${followAlongLessonId}`
+              : safeView
+        }
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={reduceMotion ? undefined : { opacity: 0 }}
@@ -108,6 +147,7 @@ export default function App() {
             progress={progress}
             onStartGuided={() => startPractice(PRACTICE_MODES.guided)}
             onStartIndependent={() => startPractice(PRACTICE_MODES.independent)}
+            onStartFollowAlong={() => startFollowAlong(DEFAULT_FOLLOW_ALONG_LESSON_ID)}
             onResetProgress={handleResetProgress}
           />
         ) : safeView === VIEWS.simulator ? (
@@ -116,6 +156,12 @@ export default function App() {
             mode={safeMode}
             onGuidedCompleted={handleGuidedCompleted}
             onIndependentCompleted={handleIndependentCompleted}
+          />
+        ) : safeView === VIEWS.followAlong ? (
+          <FollowAlongScreen
+            lessonId={followAlongLessonId}
+            onBack={goToDashboard}
+            onLessonCompleted={handleFollowAlongCompleted}
           />
         ) : (
           <AppShell>
