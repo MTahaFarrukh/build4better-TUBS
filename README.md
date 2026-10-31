@@ -110,6 +110,6 @@ Dependencies are listed in `package.json`.
 
 ## Submitted commit
 
-Final submitted commit identifier: `PENDING_FINAL_COMMIT`
+Final submitted commit identifier: `45871369ea231fd53653d41b37512836ce0d2441`
 
 That commit contains the app and this README, including the team above. The commit after it only writes this identifier.
