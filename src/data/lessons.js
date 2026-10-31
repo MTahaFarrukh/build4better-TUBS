@@ -7,9 +7,9 @@ export const FLAGSHIP_LESSON = {
   difficulty: 'Beginner',
   status: 'ready',
   stepsPreview: [
-    'Open your photo gallery',
-    'Choose a family photo',
-    'Share it with someone you trust',
+    'Open the practice Gallery',
+    'Choose a practice family photo',
+    'Share it with a fictional family contact',
   ],
 }
 

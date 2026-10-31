@@ -2,26 +2,37 @@ import { AnimatePresence, motion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
+import LessonSimulatorScreen from './screens/LessonSimulatorScreen'
 import { useLocalStorage } from './hooks/useLocalStorage'
 
 const VIEWS = {
   welcome: 'welcome',
   dashboard: 'dashboard',
+  simulator: 'simulator',
 }
 
 export default function App() {
   const [view, setView] = useLocalStorage('digital-ustaad:view', VIEWS.welcome)
   const [progress, setProgress] = useLocalStorage('digital-ustaad:progress', {
     shareFamilyPhotoStarted: false,
+    shareFamilyPhotoCompleted: false,
   })
 
   const goToDashboard = () => setView(VIEWS.dashboard)
   const goToWelcome = () => setView(VIEWS.welcome)
-
-  const handleStartLesson = () => {
+  const goToSimulator = () => {
     setProgress((prev) => ({
       ...prev,
       shareFamilyPhotoStarted: true,
+    }))
+    setView(VIEWS.simulator)
+  }
+
+  const handleLessonCompleted = () => {
+    setProgress((prev) => ({
+      ...prev,
+      shareFamilyPhotoStarted: true,
+      shareFamilyPhotoCompleted: true,
     }))
   }
 
@@ -41,7 +52,14 @@ export default function App() {
           <DashboardScreen
             onBack={goToWelcome}
             lessonStarted={Boolean(progress.shareFamilyPhotoStarted)}
-            onStartLesson={handleStartLesson}
+            lessonCompleted={Boolean(progress.shareFamilyPhotoCompleted)}
+            onStartLesson={goToSimulator}
+          />
+        ) : view === VIEWS.simulator ? (
+          <LessonSimulatorScreen
+            onBack={goToDashboard}
+            startGuided={!progress.shareFamilyPhotoCompleted}
+            onLessonCompleted={handleLessonCompleted}
           />
         ) : (
           <AppShell>

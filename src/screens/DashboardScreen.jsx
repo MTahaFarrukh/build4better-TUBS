@@ -11,7 +11,19 @@ import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { COMING_SOON_LESSONS, FLAGSHIP_LESSON } from '../data/lessons'
 
-export default function DashboardScreen({ onBack, lessonStarted, onStartLesson }) {
+export default function DashboardScreen({
+  onBack,
+  lessonStarted,
+  lessonCompleted,
+  onStartLesson,
+}) {
+  const progressPercent = lessonCompleted ? 100 : lessonStarted ? 35 : 0
+  const progressLabel = lessonCompleted
+    ? '100% — practice completed'
+    : lessonStarted
+      ? '35% — practice started'
+      : '0% — ready to begin'
+
   return (
     <AppShell onBrandClick={onBack}>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -28,7 +40,7 @@ export default function DashboardScreen({ onBack, lessonStarted, onStartLesson }
             Your learning space
           </h1>
           <p className="mt-2 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-            Begin with one practical lesson. More guided practice will arrive as we build.
+            Begin with one practical lesson on a safe practice phone.
           </p>
         </div>
       </div>
@@ -84,11 +96,15 @@ export default function DashboardScreen({ onBack, lessonStarted, onStartLesson }
                 <div className="flex flex-col gap-3">
                   <Button onClick={onStartLesson} className="w-full sm:w-fit">
                     <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                    {lessonStarted ? 'Continue lesson preview' : 'Open lesson preview'}
+                    {lessonCompleted
+                      ? 'Practice again'
+                      : lessonStarted
+                        ? 'Continue practice'
+                        : 'Start guided practice'}
                   </Button>
                   <p className="text-sm text-forest-muted">
-                    Interactive phone practice launches in the next build phase.
-                    This preview saves your interest on this device.
+                    Opens a practice smartphone with Gallery, Share, and gentle Urdu + English guidance.
+                    Nothing real is sent.
                   </p>
                 </div>
               </div>
@@ -105,19 +121,21 @@ export default function DashboardScreen({ onBack, lessonStarted, onStartLesson }
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Your progress</h2>
             <p className="mt-2 text-sm leading-relaxed text-ink/75">
-              {lessonStarted
-                ? 'You marked interest in the photo-sharing lesson. Guided practice is coming next.'
-                : 'No lessons started yet. Open the flagship lesson when you feel ready.'}
+              {lessonCompleted
+                ? 'You finished the photo-sharing practice. You can repeat it anytime.'
+                : lessonStarted
+                  ? 'You started the photo-sharing practice. Continue whenever you like.'
+                  : 'No lessons started yet. Open the flagship lesson when you feel ready.'}
             </p>
             <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage">
               <div
                 className="h-full rounded-full bg-teal transition-all duration-500"
-                style={{ width: lessonStarted ? '15%' : '0%' }}
+                style={{ width: `${progressPercent}%` }}
                 aria-hidden="true"
               />
             </div>
             <p className="mt-2 text-xs font-medium tracking-wide text-forest-muted uppercase">
-              {lessonStarted ? '15% — preview started' : '0% — ready to begin'}
+              {progressLabel}
             </p>
           </Card>
 
