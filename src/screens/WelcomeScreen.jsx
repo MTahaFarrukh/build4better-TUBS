@@ -46,8 +46,8 @@ export default function WelcomeScreen({ onStart }) {
             animate="show"
             className="mt-5 max-w-lg text-lg leading-relaxed text-ink/85 sm:text-xl"
           >
-            A calm smartphone practice space for parents and grandparents —
-            learn everyday tasks independently, one clear step at a time.
+            A calm practice phone for parents and grandparents —
+            learn everyday tasks by doing them yourself, safely, step by step.
           </motion.p>
 
           <motion.div

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   CheckCircle2,
@@ -28,6 +28,7 @@ export default function FollowAlongScreen({
   onLessonCompleted,
 }) {
   const lesson = useMemo(() => getFollowAlongLesson(lessonId), [lessonId])
+  const stepCardRef = useRef(null)
   const [stepIndex, setStepIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
@@ -35,6 +36,7 @@ export default function FollowAlongScreen({
   const [launchStatus, setLaunchStatus] = useState(null)
   const [appAvailability, setAppAvailability] = useState(null)
   const [launching, setLaunching] = useState(false)
+  const [repeatNotice, setRepeatNotice] = useState('')
 
   useEffect(() => {
     let active = true
@@ -45,6 +47,11 @@ export default function FollowAlongScreen({
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    setShowHelp(false)
+    setLaunchStatus(null)
+  }, [stepIndex])
 
   if (!lesson) {
     return (
@@ -62,6 +69,7 @@ export default function FollowAlongScreen({
   const progressPercent = Math.round(((stepIndex + 1) / totalSteps) * 100)
   const isLastStep = stepIndex >= totalSteps - 1
   const canLaunch = step?.action === 'launch-whatsapp'
+  const nativeAndroid = isNativeAndroid()
 
   const handleOpenWhatsApp = async () => {
     setLaunching(true)
@@ -76,7 +84,19 @@ export default function FollowAlongScreen({
   }
 
   const handleRepeat = () => {
+    setPaused(false)
     setShowHelp(false)
+    setRepeatNotice(`Repeating step ${stepIndex + 1}: ${step.title.en}`)
+    stepCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() => setRepeatNotice(''), 2500)
+  }
+
+  const goNext = () => {
+    setStepIndex((value) => Math.min(totalSteps - 1, value + 1))
+  }
+
+  const goPrevious = () => {
+    setStepIndex((value) => Math.max(0, value - 1))
   }
 
   if (completed) {
@@ -112,6 +132,7 @@ export default function FollowAlongScreen({
                   setPaused(false)
                   setShowHelp(false)
                   setLaunchStatus(null)
+                  setRepeatNotice('')
                 }}
               >
                 <RotateCcw className="h-5 w-5" aria-hidden="true" />
@@ -145,6 +166,9 @@ export default function FollowAlongScreen({
             <span className="rounded-full bg-sage px-3 py-1.5 text-sm font-semibold text-forest">
               Practise on My Phone
             </span>
+            <span className="rounded-full bg-teal-soft px-3 py-1.5 text-sm font-semibold text-forest">
+              English + Urdu shown together
+            </span>
           </div>
 
           <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
@@ -171,6 +195,11 @@ export default function FollowAlongScreen({
           </p>
         </Card>
 
+        <p className="sr-only" role="status" aria-live="polite">
+          {repeatNotice}
+        </p>
+
+        <div ref={stepCardRef}>
         <Card className="p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <p className="text-base font-semibold text-forest">
@@ -178,7 +207,14 @@ export default function FollowAlongScreen({
             </p>
             <p className="text-sm font-medium text-forest-muted">{progressPercent}%</p>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-sage" aria-hidden="true">
+          <div
+            className="h-3 overflow-hidden rounded-full bg-sage"
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={totalSteps}
+            aria-valuenow={stepIndex + 1}
+            aria-label={`Follow-Along step ${stepIndex + 1} of ${totalSteps}`}
+          >
             <div
               className="h-full rounded-full bg-teal transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
@@ -194,7 +230,7 @@ export default function FollowAlongScreen({
               </p>
               <Button className="mt-5" onClick={() => setPaused(false)}>
                 <Play className="h-5 w-5" aria-hidden="true" />
-                Continue
+                Resume
               </Button>
             </div>
           ) : (
@@ -216,31 +252,43 @@ export default function FollowAlongScreen({
                 <div className="mt-5 space-y-3 rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
                   <p className="flex items-center gap-2 text-base font-semibold text-forest">
                     <Smartphone className="h-5 w-5 text-teal" aria-hidden="true" />
-                    {isNativeAndroid()
+                    {nativeAndroid
                       ? 'Open WhatsApp on this phone'
-                      : 'Open WhatsApp yourself'}
+                      : 'Open WhatsApp on your phone'}
                   </p>
-                  {appAvailability && !appAvailability.native && (
-                    <p className="text-base text-forest-muted">
-                      Browser preview cannot launch WhatsApp. On your Android phone app, a button can open it for you. For now, open WhatsApp manually.
-                    </p>
+
+                  {!nativeAndroid && (
+                    <>
+                      <p className="text-base text-forest-muted">
+                        This web version cannot open WhatsApp for you. Open WhatsApp yourself on your phone, then come back here and tap Continue.
+                      </p>
+                      <p className="text-base text-forest-muted" lang="ur" dir="auto">
+                        یہ ویب ورژن واٹس ایپ خود نہیں کھول سکتا۔ فون پر واٹس ایپ خود کھولیں، پھر یہاں واپس آ کر Continue دبائیں۔
+                      </p>
+                    </>
                   )}
-                  {appAvailability?.native &&
+
+                  {nativeAndroid &&
+                    appAvailability &&
                     !appAvailability.whatsapp &&
                     !appAvailability.whatsappBusiness && (
                       <p className="text-base text-forest-muted">
                         WhatsApp does not appear to be installed. Install WhatsApp or WhatsApp Business, then try again.
                       </p>
                     )}
-                  <Button
-                    onClick={handleOpenWhatsApp}
-                    disabled={launching}
-                    className="w-full sm:w-auto"
-                  >
-                    <ExternalLink className="h-5 w-5" aria-hidden="true" />
-                    {launching ? 'Opening…' : 'Open WhatsApp'}
-                  </Button>
-                  {launchStatus && (
+
+                  {nativeAndroid && (
+                    <Button
+                      onClick={handleOpenWhatsApp}
+                      disabled={launching}
+                      className="w-full sm:w-auto"
+                    >
+                      <ExternalLink className="h-5 w-5" aria-hidden="true" />
+                      {launching ? 'Opening…' : 'Open WhatsApp'}
+                    </Button>
+                  )}
+
+                  {nativeAndroid && launchStatus && (
                     <p className="text-base text-forest-muted" role="status">
                       {launchStatus.opened
                         ? `Opened ${launchStatus.app === 'com.whatsapp.w4b' ? 'WhatsApp Business' : 'WhatsApp'}. Continue the steps there, then return here.`
@@ -267,12 +315,13 @@ export default function FollowAlongScreen({
             </div>
           )}
         </Card>
+        </div>
 
         {!paused && (
           <div className="grid gap-3 sm:grid-cols-2">
             <Button
               variant="secondary"
-              onClick={() => setStepIndex((value) => Math.max(0, value - 1))}
+              onClick={goPrevious}
               disabled={stepIndex === 0}
             >
               Previous
@@ -283,7 +332,7 @@ export default function FollowAlongScreen({
                 Done — I confirmed myself
               </Button>
             ) : (
-              <Button onClick={() => setStepIndex((value) => Math.min(totalSteps - 1, value + 1))}>
+              <Button onClick={goNext}>
                 Continue
               </Button>
             )}

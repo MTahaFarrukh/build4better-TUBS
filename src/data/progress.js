@@ -1,11 +1,16 @@
 export const DEFAULT_PROGRESS = {
-  version: 3,
-  shareFamilyPhotoStarted: false,
-  guidedCompleted: false,
-  independentCompleted: false,
+  version: 4,
+  lessonsStarted: false,
+  guidedCompletedIds: [],
+  independentCompletedIds: [],
+  latestResult: null,
   latestIndependentResult: null,
   followAlongStarted: false,
   followAlongCompletedLessonIds: [],
+  // legacy-compatible flags used by older UI copy paths
+  shareFamilyPhotoStarted: false,
+  guidedCompleted: false,
+  independentCompleted: false,
 }
 
 export const COMPLETED_STEPS = [
@@ -13,34 +18,37 @@ export const COMPLETED_STEPS = [
   { id: 'open-share', labelEn: 'Opened Share', labelUr: 'Share کھولا' },
   { id: 'choose-contact', labelEn: 'Chose a contact', labelUr: 'رابطہ چنا' },
   { id: 'confirm', labelEn: 'Confirmed sharing', labelUr: 'شیئر کی تصدیق کی' },
+  { id: 'open-whatsapp', labelEn: 'Opened WhatsApp', labelUr: 'واٹس ایپ کھولی' },
+  { id: 'open-chat', labelEn: 'Opened a chat', labelUr: 'چیٹ کھولی' },
+  { id: 'start-recording', labelEn: 'Held to record', labelUr: 'ریکارڈ کرنے دبایا' },
+  { id: 'send-voice', labelEn: 'Sent voice note', labelUr: 'وائس نوٹ بھیجا' },
 ]
+
+function sanitizeIds(raw) {
+  if (!Array.isArray(raw)) return []
+  return [...new Set(raw.filter((id) => typeof id === 'string' && id.trim()))]
+}
 
 function sanitizeResult(raw) {
   if (!raw || typeof raw !== 'object') return null
-
   const incorrectAttempts = Number(raw.incorrectAttempts)
   const successfulActions = Number(raw.successfulActions)
   const durationMs = Number(raw.durationMs)
-
   const mode = raw.mode === 'guided' || raw.mode === 'independent' ? raw.mode : null
 
   return {
     completed: Boolean(raw.completed),
     mode,
+    lessonId: typeof raw.lessonId === 'string' ? raw.lessonId : null,
     incorrectAttempts: Number.isFinite(incorrectAttempts) ? Math.max(0, incorrectAttempts) : 0,
     successfulActions: Number.isFinite(successfulActions) ? Math.max(0, successfulActions) : 0,
     durationMs: Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : null,
     completedWithoutAssistance: Boolean(raw.completedWithoutAssistance),
     completedSteps: Array.isArray(raw.completedSteps)
       ? raw.completedSteps.filter((step) => typeof step === 'string')
-      : COMPLETED_STEPS.map((step) => step.id),
+      : [],
     finishedAt: typeof raw.finishedAt === 'string' ? raw.finishedAt : null,
   }
-}
-
-function sanitizeLessonIds(raw) {
-  if (!Array.isArray(raw)) return []
-  return [...new Set(raw.filter((id) => typeof id === 'string' && id.trim()))]
 }
 
 export function normalizeProgress(raw) {
@@ -48,66 +56,69 @@ export function normalizeProgress(raw) {
     return { ...DEFAULT_PROGRESS }
   }
 
-  const guidedCompleted = Boolean(
-    raw.guidedCompleted || raw.shareFamilyPhotoCompleted,
+  const guidedCompletedIds = sanitizeIds(
+    raw.guidedCompletedIds ||
+      (raw.guidedCompleted || raw.shareFamilyPhotoCompleted
+        ? ['share-family-photo']
+        : []),
   )
-  const independentCompleted = Boolean(raw.independentCompleted)
-  const followAlongCompletedLessonIds = sanitizeLessonIds(
-    raw.followAlongCompletedLessonIds,
+  const independentCompletedIds = sanitizeIds(
+    raw.independentCompletedIds ||
+      (raw.independentCompleted ? ['share-family-photo'] : []),
   )
-  const followAlongStarted = Boolean(
-    raw.followAlongStarted || followAlongCompletedLessonIds.length > 0,
-  )
-  const started = Boolean(
-    raw.shareFamilyPhotoStarted ||
-      guidedCompleted ||
-      independentCompleted ||
-      followAlongStarted,
+  const followAlongCompletedLessonIds = sanitizeIds(raw.followAlongCompletedLessonIds)
+  const lessonsStarted = Boolean(
+    raw.lessonsStarted ||
+      raw.shareFamilyPhotoStarted ||
+      guidedCompletedIds.length ||
+      independentCompletedIds.length ||
+      raw.followAlongStarted ||
+      followAlongCompletedLessonIds.length,
   )
 
   return {
-    version: 3,
-    shareFamilyPhotoStarted: started,
-    guidedCompleted,
-    independentCompleted,
+    version: 4,
+    lessonsStarted,
+    guidedCompletedIds,
+    independentCompletedIds,
+    latestResult: sanitizeResult(raw.latestResult || raw.latestIndependentResult),
     latestIndependentResult: sanitizeResult(raw.latestIndependentResult),
-    followAlongStarted,
+    followAlongStarted: Boolean(raw.followAlongStarted || followAlongCompletedLessonIds.length),
     followAlongCompletedLessonIds,
+    shareFamilyPhotoStarted: lessonsStarted,
+    guidedCompleted: guidedCompletedIds.length > 0,
+    independentCompleted: independentCompletedIds.length > 0,
   }
 }
 
 export function getProgressPercent(progress) {
   const data = normalizeProgress(progress)
-  if (data.followAlongCompletedLessonIds.length > 0 && data.independentCompleted) {
-    return 100
-  }
-  if (data.independentCompleted) return 90
-  if (data.followAlongCompletedLessonIds.length > 0) return 80
-  if (data.guidedCompleted) return 65
-  if (data.shareFamilyPhotoStarted || data.followAlongStarted) return 30
+  const guided = data.guidedCompletedIds.length
+  const independent = data.independentCompletedIds.length
+  if (guided >= 2 && independent >= 2) return 100
+  if (independent >= 1 && guided >= 1) return 85
+  if (independent >= 1 || guided >= 2) return 70
+  if (guided >= 1) return 45
+  if (data.lessonsStarted || data.followAlongStarted) return 20
   return 0
 }
 
 export function getProgressLabel(progress) {
   const data = normalizeProgress(progress)
-  if (data.followAlongCompletedLessonIds.length > 0) {
-    return 'Follow-Along practice completed'
+  if (data.guidedCompletedIds.length >= 2 && data.independentCompletedIds.length >= 2) {
+    return 'Both lessons practised'
   }
-  if (data.independentCompleted) return 'Independent practice completed'
-  if (data.guidedCompleted) return 'Guided practice completed'
-  if (data.shareFamilyPhotoStarted || data.followAlongStarted) return 'Practice started'
+  if (data.independentCompletedIds.length) return 'Independent practice completed'
+  if (data.guidedCompletedIds.length) return 'Guided practice completed'
+  if (data.lessonsStarted) return 'Practice started'
   return 'Ready to begin'
 }
 
 export function formatDuration(durationMs) {
-  if (durationMs == null || !Number.isFinite(durationMs) || durationMs < 0) {
-    return null
-  }
-
+  if (durationMs == null || !Number.isFinite(durationMs) || durationMs < 0) return null
   const totalSeconds = Math.round(durationMs / 1000)
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
-
   if (minutes <= 0) return `${seconds} seconds`
   if (seconds === 0) return `${minutes} min`
   return `${minutes} min ${seconds} sec`

@@ -6,48 +6,48 @@
 ---
 
 ### 0:00–0:15 — Hook
-“Many Pakistani parents and grandparents want to share family photos, but a real phone can feel confusing. Digital Ustaad is a calm practice phone — nothing real is sent.”
+“Many Pakistani parents and grandparents want to use their phones for family photos and WhatsApp voice notes, but a real phone can feel confusing. Digital Ustaad is a calm practice phone — you learn by doing, and nothing real is sent.”
 
 **On screen:** Welcome → tap Start learning
 
 ---
 
-### 0:15–0:35 — Dashboard
-“From the learning space, choose Guided Practice for step-by-step help in English and Urdu, or Independent Practice to try alone.”
+### 0:15–0:30 — Dashboard
+“Two complete interactive lessons: share a family photo, and send a WhatsApp voice message. Each has Guided Practice and Independent Practice.”
 
-**On screen:** Dashboard showing both buttons and Practice mode messaging
-
----
-
-### 0:35–1:10 — Guided flow
-“In Guided Practice, Digital Ustaad highlights each step: open Gallery, choose a practice photo, tap Share, pick Ammi, Abu, Beti, or Family Group — then Confirm. All contacts and photos are fictional.”
-
-**On screen:** Complete the guided photo-share once
+**On screen:** Dashboard with both lessons
 
 ---
 
-### 1:10–1:35 — Results
-“When the practice is done, the results screen shows what was completed on this attempt — helpful taps, extra tries, and time. It is practice feedback only, not a real-world skill score.”
+### 0:30–1:05 — Guided photo share
+“In Guided Practice, Ustaad highlights each step on the practice phone: open Gallery, choose a photo, Share, pick Ammi or Abu, Confirm. Wrong taps get a gentle tip. All contacts and photos are fictional.”
 
-**On screen:** Results → Practise Again or Back to Dashboard
-
----
-
-### 1:35–1:55 — Independent + safety
-“Independent Practice uses the same safe phone without the guide. Progress stays on this device. No accounts, no real messages, no personal data.”
-
-**On screen:** Brief Independent Practice entry or dashboard progress card
+**On screen:** Complete guided photo-share once (or jump to success)
 
 ---
 
-### 1:55–2:00 — Close
+### 1:05–1:30 — Voice message (quick)
+“Same idea for WhatsApp: open the practice app, open Ammi’s chat, hold the mic, release to send a practice voice note.”
+
+**On screen:** Brief guided voice attempt or success state
+
+---
+
+### 1:30–1:50 — Results + safety
+“Results show helpful taps, extra tries, and time for this attempt only — not a real-world skill score. Independent Practice removes the step guide. Progress stays on this device.”
+
+**On screen:** Results → Back to Dashboard
+
+---
+
+### 1:50–2:00 — Close
 “Digital Ustaad — patient smartphone practice for Pakistani families. Built by Team TUBS.”
 
 ---
 
 ## Do not claim in the video
 - Real phone integration
-- Real messaging or contact access
+- Real messaging, mic audio upload, or contact access
 - AI tutoring that is not implemented
 - That one practice proves real-world digital literacy
 - Unfinished “coming soon” lessons as working features

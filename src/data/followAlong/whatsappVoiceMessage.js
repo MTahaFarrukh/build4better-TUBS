@@ -45,8 +45,8 @@ export const WHATSAPP_VOICE_MESSAGE_LESSON = {
         ur: 'واٹس ایپ کھولیں',
       },
       instruction: {
-        en: 'Open WhatsApp on your phone. If you are in the Digital Ustaad app on Android, you can use the Open WhatsApp button.',
-        ur: 'اپنے فون پر واٹس ایپ کھولیں۔ اگر آپ اینڈرائیڈ پر ڈجیٹل استاد میں ہیں تو Open WhatsApp بٹن استعمال کر سکتے ہیں۔',
+        en: 'Open WhatsApp on your phone yourself. Then return to this page and tap Continue.',
+        ur: 'اپنے فون پر واٹس ایپ خود کھولیں۔ پھر اس صفحے پر واپس آ کر Continue دبائیں۔',
       },
       help: {
         en: 'Look for the green WhatsApp icon. WhatsApp Business also works if that is what your family uses.',

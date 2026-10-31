@@ -1,205 +1,167 @@
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
-  Clock3,
   Compass,
   ImagePlus,
   Lock,
+  Mic,
   RotateCcw,
   Smartphone,
-  Sparkles,
 } from 'lucide-react'
 import AppShell from '../components/layout/AppShell'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import { WHATSAPP_VOICE_MESSAGE_LESSON } from '../data/followAlong'
-import { COMING_SOON_LESSONS, FLAGSHIP_LESSON } from '../data/lessons'
+import { INTERACTIVE_LESSONS, LESSON_IDS } from '../data/interactiveLessons'
+import { COMING_SOON_LESSONS } from '../data/lessons'
 import {
   formatDuration,
   getProgressLabel,
   getProgressPercent,
 } from '../data/progress'
+import { PRACTICE_MODES } from '../hooks/usePracticePhone'
 
 export default function DashboardScreen({
   onBack,
   progress,
-  onStartGuided,
-  onStartIndependent,
+  onStartLesson,
   onStartFollowAlong,
   onResetProgress,
 }) {
-  const followAlongDone = progress?.followAlongCompletedLessonIds?.includes(
-    WHATSAPP_VOICE_MESSAGE_LESSON.id,
-  )
   const progressPercent = getProgressPercent(progress)
   const progressLabel = getProgressLabel(progress)
-  const latest = progress?.latestIndependentResult
+  const latest = progress?.latestResult || progress?.latestIndependentResult
   const latestDuration = formatDuration(latest?.durationMs)
 
   const handleResetProgress = () => {
     const confirmed = window.confirm(
-      'Clear the practice progress saved on this device?\n\nYou can still open Guided and Independent practice afterwards.',
+      'Clear the practice progress saved on this device?\n\nYou can still open every lesson afterwards.',
     )
     if (confirmed) onResetProgress?.()
   }
 
+  const lessonMeta = [
+    {
+      ...INTERACTIVE_LESSONS.find((item) => item.id === LESSON_IDS.sharePhoto),
+      icon: ImagePlus,
+      accent: 'from-forest via-forest-muted to-teal',
+    },
+    {
+      ...INTERACTIVE_LESSONS.find((item) => item.id === LESSON_IDS.voiceMessage),
+      icon: Mic,
+      accent: 'from-teal to-forest',
+    },
+  ]
+
   return (
     <AppShell onBrandClick={onBack}>
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <button
-            type="button"
-            onClick={onBack}
-            className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-            Back to welcome
-          </button>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
-            Your learning space
-          </h1>
-          <p className="mt-2 max-w-2xl text-lg leading-relaxed text-ink/80">
-            Practise in the simulator, then follow along on your real phone — you stay in control.
-          </p>
-          <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
-            پہلے سیمولیٹر میں مشق کریں، پھر اپنے حقیقی فون پر قدم بہ قدم چلیں۔
-          </p>
-        </div>
+      <div className="mb-8">
+        <button
+          type="button"
+          onClick={onBack}
+          className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted hover:text-forest"
+        >
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          Back to welcome
+        </button>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
+          Your learning space
+        </h1>
+        <p className="mt-2 max-w-3xl text-lg leading-relaxed text-ink/80">
+          Learn by doing on a safe practice phone. Complete Guided Practice, then try Independent Practice.
+        </p>
+        <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
+          محفوظ مشق والے فون پر خود کر کے سیکھیں — پہلے رہنمائی، پھر خود۔
+        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.35fr_0.85fr]">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <div className="space-y-6">
+          {lessonMeta.map((lesson) => {
+            const Icon = lesson.icon
+            const guidedDone = progress.guidedCompletedIds?.includes(lesson.id)
+            const independentDone = progress.independentCompletedIds?.includes(lesson.id)
+
+            return (
+              <motion.div
+                key={lesson.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+              >
+                <Card className="overflow-hidden p-0">
+                  <div className="grid md:grid-cols-[0.85fr_1.15fr]">
+                    <div className={`bg-gradient-to-br ${lesson.accent} p-6 text-ivory`}>
+                      <Icon className="h-8 w-8" aria-hidden="true" />
+                      <h2 className="font-display mt-5 text-3xl font-semibold leading-tight">
+                        {lesson.titleEn}
+                      </h2>
+                      <p className="mt-2 text-lg text-ivory/90" lang="ur" dir="auto">
+                        {lesson.titleUr}
+                      </p>
+                      <p className="mt-4 text-sm text-ivory/80">
+                        About {lesson.durationMinutes} minutes · Practice Mode
+                      </p>
+                    </div>
+                    <div className="flex flex-col justify-between gap-5 p-6 sm:p-8">
+                      <p className="text-base leading-relaxed text-ink/85 sm:text-lg">
+                        {lesson.descriptionEn}
+                      </p>
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          onClick={() => onStartLesson(lesson.id, PRACTICE_MODES.guided)}
+                          className="w-full sm:w-fit"
+                        >
+                          <ImagePlus className="h-5 w-5" aria-hidden="true" />
+                          {guidedDone ? 'Replay guided practice' : 'Start guided practice'}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() => onStartLesson(lesson.id, PRACTICE_MODES.independent)}
+                          className="w-full sm:w-fit"
+                        >
+                          <Compass className="h-5 w-5" aria-hidden="true" />
+                          {independentDone ? 'Replay independent practice' : 'Independent Practice'}
+                        </Button>
+                        <p className="text-sm text-forest-muted">
+                          You perform every tap inside the practice phone. Nothing real is sent.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            )
+          })}
+
           <Card className="overflow-hidden p-0">
-            <div className="grid md:grid-cols-[0.9fr_1.1fr]">
-              <div className="relative min-h-[220px] bg-gradient-to-br from-forest via-forest-muted to-teal p-6 text-ivory md:min-h-full">
-                <div className="absolute inset-0 opacity-30">
-                  <div className="absolute top-8 left-8 h-24 w-24 rounded-3xl border border-ivory/30" />
-                  <div className="absolute right-6 bottom-10 h-32 w-32 rounded-full border border-ivory/20" />
-                </div>
-                <div className="relative flex h-full flex-col justify-between gap-8">
-                  <div>
-                    <span className="inline-flex items-center gap-2 rounded-full bg-ivory/15 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em]">
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      Flagship lesson
-                    </span>
-                    <h2 className="font-display mt-5 text-3xl leading-tight font-semibold">
-                      {FLAGSHIP_LESSON.title}
-                    </h2>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-ivory/85">
-                    <Clock3 className="h-4 w-4" aria-hidden="true" />
-                    About {FLAGSHIP_LESSON.durationMinutes} minutes · {FLAGSHIP_LESSON.difficulty}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-between gap-6 p-6 sm:p-8">
-                <div>
-                  <p className="text-base leading-relaxed text-ink/85 sm:text-lg">
-                    {FLAGSHIP_LESSON.description}
-                  </p>
-
-                  <ol className="mt-6 space-y-3">
-                    {FLAGSHIP_LESSON.stepsPreview.map((step, index) => (
-                      <li key={step} className="flex items-start gap-3 text-sm sm:text-base">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage text-sm font-semibold text-forest">
-                          {index + 1}
-                        </span>
-                        <span className="pt-1 text-ink/90">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Button onClick={onStartGuided} className="w-full sm:w-fit">
-                    <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                    {progress.guidedCompleted ? 'Replay guided practice' : 'Start guided practice'}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={onStartIndependent}
-                    className="w-full sm:w-fit"
-                  >
-                    <Compass className="h-5 w-5" aria-hidden="true" />
-                    Independent Practice
-                  </Button>
-                  <p className="text-base text-forest-muted">
-                    Guided mode shows Urdu + English steps. Independent mode hides the guide so you can practise freely. Nothing real is sent.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="mt-6 overflow-hidden p-0">
             <div className="grid md:grid-cols-[0.85fr_1.15fr]">
-              <div className="bg-gradient-to-br from-teal to-forest p-6 text-ivory">
-                <span className="inline-flex items-center gap-2 rounded-full bg-ivory/15 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em]">
-                  <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
-                  Follow-Along
-                </span>
-                <h2 className="font-display mt-5 text-3xl font-semibold leading-tight">
-                  Practise on My Phone
+              <div className="bg-forest p-6 text-ivory">
+                <Smartphone className="h-7 w-7" aria-hidden="true" />
+                <h2 className="font-display mt-4 text-2xl font-semibold">
+                  Optional: real-phone checklist
                 </h2>
-                <p className="mt-3 text-base text-ivory/85">
-                  Real phone steps. You do every action yourself.
-                </p>
               </div>
-              <div className="flex flex-col justify-between gap-5 p-6 sm:p-8">
-                <div>
-                  <h3 className="font-display text-2xl font-semibold text-forest">
-                    {WHATSAPP_VOICE_MESSAGE_LESSON.title.en}
-                  </h3>
-                  <p className="mt-1 text-lg text-forest" lang="ur" dir="auto">
-                    {WHATSAPP_VOICE_MESSAGE_LESSON.title.ur}
-                  </p>
-                  <p className="mt-3 text-base leading-relaxed text-ink/85">
-                    {WHATSAPP_VOICE_MESSAGE_LESSON.description.en}
-                  </p>
-                  <p className="mt-3 rounded-2xl bg-sage/80 px-4 py-3 text-base font-semibold text-forest">
-                    Ustaad guides you, but you control your phone.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <Button onClick={onStartFollowAlong} className="w-full sm:w-fit">
-                    <Smartphone className="h-5 w-5" aria-hidden="true" />
-                    {followAlongDone ? 'Practise on My Phone again' : 'Practise on My Phone'}
-                  </Button>
-                  <p className="text-base text-forest-muted">
-                    Digital Ustaad never reads chats or verifies a real message. You confirm completion yourself.
-                  </p>
-                </div>
+              <div className="flex flex-col justify-between gap-4 p-6">
+                <p className="text-base text-ink/85">
+                  A simple Follow-Along checklist if you also want reminders while using your real phone. The interactive lessons above are the main way to learn by doing.
+                </p>
+                <Button variant="secondary" onClick={onStartFollowAlong} className="w-full sm:w-fit">
+                  Open Follow-Along checklist
+                </Button>
               </div>
             </div>
           </Card>
-        </motion.div>
+        </div>
 
-        <motion.aside
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-4"
-        >
+        <aside className="space-y-4">
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Your progress</h2>
-            <p className="mt-2 text-base leading-relaxed text-ink/75">
-              {followAlongDone
-                ? 'You marked a Follow-Along phone lesson complete. Simulator practice is still available anytime.'
-                : progress.independentCompleted
-                  ? 'You finished Independent Practice on this device. You can practise again anytime.'
-                  : progress.guidedCompleted
-                    ? 'Guided practice is saved. Try Independent Practice or Practise on My Phone when ready.'
-                    : progress.shareFamilyPhotoStarted || progress.followAlongStarted
-                      ? 'You started practice on this device. Continue whenever you like.'
-                      : 'No practice saved yet. Start with Guided Practice or Practise on My Phone.'}
+            <p className="mt-2 text-base text-ink/75">
+              Guided lessons done: {progress.guidedCompletedIds?.length ?? 0} · Independent:{' '}
+              {progress.independentCompletedIds?.length ?? 0}
             </p>
             <p className="mt-2 text-sm text-forest-muted">
-              Progress here only tracks practice on this device — not real-world phone skill.
+              Progress tracks practice on this device — not real-world phone skill.
             </p>
             <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage">
               <div
@@ -209,13 +171,12 @@ export default function DashboardScreen({
               />
             </div>
             <p className="mt-2 text-sm font-medium text-forest-muted">
-              Practice progress: {progressPercent}% — {progressLabel}
+              {progressPercent}% — {progressLabel}
             </p>
-
             <button
               type="button"
               onClick={handleResetProgress}
-              className="touch-target mt-5 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
+              className="touch-target mt-5 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted hover:text-forest"
             >
               <RotateCcw className="h-5 w-5" aria-hidden="true" />
               Reset saved progress
@@ -225,45 +186,32 @@ export default function DashboardScreen({
           {latest?.completed && (
             <Card className="p-6">
               <h2 className="font-display text-xl font-semibold text-forest">
-                Latest independent practice attempt
+                Latest practice attempt
               </h2>
-              <p className="mt-2 text-sm text-forest-muted">
-                Notes from your last Independent Practice try on this device.
-              </p>
               <ul className="mt-4 space-y-2 text-base text-ink/85">
-                <li>Helpful taps: {latest.successfulActions}</li>
+                <li>Mode: {latest.mode}</li>
+                <li>Helpful actions: {latest.successfulActions}</li>
                 <li>Extra tries: {latest.incorrectAttempts}</li>
-                <li>Time on that attempt: {latestDuration ?? 'Not recorded'}</li>
-                <li>
-                  {latest.completedWithoutAssistance
-                    ? 'Finished without the step-by-step guide'
-                    : 'Completed with assistance'}
-                </li>
+                <li>Time: {latestDuration ?? 'Not recorded'}</li>
               </ul>
-              <p className="mt-3 text-base text-forest-muted" lang="ur" dir="auto">
-                آخری خود مشق کا نتیجہ اسی آلے پر محفوظ ہے۔
-              </p>
             </Card>
           )}
 
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Coming soon</h2>
             <ul className="mt-4 space-y-3">
-              {COMING_SOON_LESSONS.map((lesson) => (
-                <li
-                  key={lesson.id}
-                  className="flex items-start gap-3 rounded-2xl bg-sage/60 px-4 py-3"
-                >
+              {COMING_SOON_LESSONS.map((item) => (
+                <li key={item.id} className="flex items-start gap-3 rounded-2xl bg-sage/60 px-4 py-3">
                   <Lock className="mt-0.5 h-4 w-4 shrink-0 text-forest-muted" aria-hidden="true" />
                   <div>
-                    <p className="font-medium text-forest">{lesson.title}</p>
-                    <p className="text-sm text-forest-muted">{lesson.description}</p>
+                    <p className="font-medium text-forest">{item.title}</p>
+                    <p className="text-sm text-forest-muted">{item.description}</p>
                   </div>
                 </li>
               ))}
             </ul>
           </Card>
-        </motion.aside>
+        </aside>
       </div>
     </AppShell>
   )

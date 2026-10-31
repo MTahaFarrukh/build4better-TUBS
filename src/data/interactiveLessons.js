@@ -1,0 +1,136 @@
+export const LESSON_IDS = {
+  sharePhoto: 'share-family-photo',
+  voiceMessage: 'whatsapp-voice-message',
+}
+
+export const INTERACTIVE_LESSONS = [
+  {
+    id: LESSON_IDS.sharePhoto,
+    titleEn: 'Share a family photo',
+    titleUr: 'خاندانی تصویر شیئر کریں',
+    descriptionEn:
+      'Practise opening Gallery, choosing a photo, and sharing it with a fictional family contact — inside this safe practice phone.',
+    descriptionUr:
+      'گیلری کھولنا، تصویر چننا، اور خاندانی رابطے کو شیئر کرنا — محفوظ مشق والے فون میں سیکھیں۔',
+    durationMinutes: 8,
+    homeApp: 'gallery',
+    steps: [
+      {
+        id: 1,
+        target: 'gallery-app',
+        titleEn: 'Open Gallery',
+        titleUr: 'گیلری کھولیں',
+        textEn: 'Tap the Gallery app on the home screen.',
+        textUr: 'ہوم اسکرین پر Gallery پر tap کریں۔',
+        helpEn: 'Look for the teal Gallery icon.',
+        helpUr: 'سبز مائل Gallery آئیکن تلاش کریں۔',
+        successEvent: 'OPEN_GALLERY',
+      },
+      {
+        id: 2,
+        target: 'photo-grid',
+        titleEn: 'Choose a photo',
+        titleUr: 'تصویر منتخب کریں',
+        textEn: 'Tap any practice photo you like.',
+        textUr: 'کوئی بھی مشق والی تصویر منتخب کریں۔',
+        helpEn: 'Any square photo in the grid is fine.',
+        helpUr: 'گرڈ میں کوئی بھی تصویر ٹھیک ہے۔',
+        successEvent: 'SELECT_PHOTO',
+      },
+      {
+        id: 3,
+        target: 'share-button',
+        titleEn: 'Share the photo',
+        titleUr: 'تصویر شیئر کریں',
+        textEn: 'Press the Share button.',
+        textUr: 'Share بٹن دبائیں۔',
+        helpEn: 'Share is near the bottom of the photo.',
+        helpUr: 'Share بٹن تصویر کے نیچے ہے۔',
+        successEvent: 'OPEN_SHARE',
+      },
+      {
+        id: 4,
+        target: 'recipient-list',
+        titleEn: 'Pick a family member',
+        titleUr: 'خاندان کا رکن چنیں',
+        textEn: 'Select Ammi, Abu, Beti, or Family Group.',
+        textUr: 'امی، ابو، بیٹی، یا Family Group منتخب کریں۔',
+        helpEn: 'Tap one contact so it highlights.',
+        helpUr: 'ایک رابطے پر tap کریں تاکہ وہ منتخب ہو۔',
+        successEvent: 'SELECT_RECIPIENT',
+      },
+      {
+        id: 5,
+        target: 'confirm-share',
+        titleEn: 'Confirm sharing',
+        titleUr: 'شیئر کی تصدیق',
+        textEn: 'Tap Confirm Share. Nothing real is sent.',
+        textUr: 'Confirm Share دبائیں۔ حقیقی پیغام نہیں جائے گا۔',
+        helpEn: 'Choose someone first if Confirm does nothing.',
+        helpUr: 'پہلے کسی کو منتخب کریں۔',
+        successEvent: 'CONFIRM_SHARE',
+      },
+    ],
+  },
+  {
+    id: LESSON_IDS.voiceMessage,
+    titleEn: 'Send a WhatsApp voice message',
+    titleUr: 'واٹس ایپ وائس میسج بھیجیں',
+    descriptionEn:
+      'Practise opening WhatsApp, opening a chat, holding the mic to record, and releasing to send — all in Practice Mode.',
+    descriptionUr:
+      'واٹس ایپ کھولنا، چیٹ کھولنا، مائیک دبا کر ریکارڈ کرنا، اور چھوڑ کر بھیجنا — سب مشق موڈ میں۔',
+    durationMinutes: 8,
+    homeApp: 'whatsapp',
+    steps: [
+      {
+        id: 1,
+        target: 'whatsapp-app',
+        titleEn: 'Open WhatsApp',
+        titleUr: 'واٹس ایپ کھولیں',
+        textEn: 'Tap the WhatsApp app on the practice home screen.',
+        textUr: 'مشق ہوم اسکرین پر WhatsApp پر tap کریں۔',
+        helpEn: 'Use the green WhatsApp icon — not Gallery for this lesson.',
+        helpUr: 'سبز WhatsApp آئیکن استعمال کریں — اس سبق میں Gallery نہیں۔',
+        successEvent: 'OPEN_WHATSAPP',
+      },
+      {
+        id: 2,
+        target: 'chat-list',
+        titleEn: 'Open a chat',
+        titleUr: 'چیٹ کھولیں',
+        textEn: 'Tap a family conversation, such as Ammi.',
+        textUr: 'کسی خاندانی چیٹ پر tap کریں، جیسے امی۔',
+        helpEn: 'Any practice chat is fine.',
+        helpUr: 'کوئی بھی مشق والی چیٹ ٹھیک ہے۔',
+        successEvent: 'OPEN_CHAT',
+      },
+      {
+        id: 3,
+        target: 'mic-button',
+        titleEn: 'Hold to record',
+        titleUr: 'دبا کر ریکارڈ کریں',
+        textEn: 'Press and hold the microphone button to record.',
+        textUr: 'مائیکروفون بٹن دبا کر تھامیں اور ریکارڈ کریں۔',
+        helpEn: 'Keep holding — a short practice beep is enough.',
+        helpUr: 'دبائے رکھیں — مختصر مشق کافی ہے۔',
+        successEvent: 'START_RECORDING',
+      },
+      {
+        id: 4,
+        target: 'mic-button',
+        titleEn: 'Release to send',
+        titleUr: 'چھوڑ کر بھیجیں',
+        textEn: 'Release the microphone to send the practice voice note.',
+        textUr: 'مائیکروفون چھوڑیں تاکہ مشق وائس نوٹ بھیجے۔',
+        helpEn: 'Let go of the mic while it shows Recording…',
+        helpUr: 'جب Recording… دکھے تو مائیک چھوڑ دیں۔',
+        successEvent: 'SEND_VOICE',
+      },
+    ],
+  },
+]
+
+export function getInteractiveLesson(id) {
+  return INTERACTIVE_LESSONS.find((lesson) => lesson.id === id) ?? null
+}

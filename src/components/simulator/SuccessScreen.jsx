@@ -5,6 +5,8 @@ import Button from '../ui/Button'
 export default function SuccessScreen({
   photo,
   recipientName,
+  title = 'Done in Practice Mode!',
+  message,
   onReset,
   onBackHome,
 }) {
@@ -23,14 +25,16 @@ export default function SuccessScreen({
         Practice complete
       </p>
       <h2 className="font-display mt-2 text-3xl font-semibold text-forest">
-        Photo shared!
+        {title}
       </h2>
       <p className="mt-3 max-w-xs text-base leading-relaxed text-ink/80">
-        In practice mode, you shared{' '}
-        <span className="font-semibold text-forest">{photo?.caption ?? 'a photo'}</span>
-        {' '}with{' '}
-        <span className="font-semibold text-forest">{recipientName}</span>.
-        No real message was sent.
+        {message || (
+          <>
+            In Practice Mode, you completed this task with{' '}
+            <span className="font-semibold text-forest">{recipientName}</span>.
+            No real message was sent.
+          </>
+        )}
       </p>
       <p className="mt-2 text-sm text-forest-muted" lang="ur" dir="auto">
         مشق مکمل — حقیقی پیغام نہیں گیا۔

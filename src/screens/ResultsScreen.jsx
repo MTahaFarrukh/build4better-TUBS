@@ -4,8 +4,9 @@ import AppShell from '../components/layout/AppShell'
 import PracticeBadge from '../components/simulator/PracticeBadge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import { LESSON_IDS } from '../data/interactiveLessons'
 import { COMPLETED_STEPS, formatDuration } from '../data/progress'
-import { PRACTICE_MODES } from '../hooks/useSimulator'
+import { PRACTICE_MODES } from '../hooks/usePracticePhone'
 
 function ConfettiBurst({ enabled }) {
   if (!enabled) return null
@@ -45,6 +46,13 @@ export default function ResultsScreen({
   const incorrect = result?.incorrectAttempts ?? 0
   const successful = result?.successfulActions ?? 0
   const isIndependent = mode === PRACTICE_MODES.independent
+  const isVoiceLesson = result?.lessonId === LESSON_IDS.voiceMessage
+  const headlineEn = isVoiceLesson
+    ? 'You sent a practice voice message!'
+    : 'You shared the photo successfully in practice!'
+  const headlineUr = isVoiceLesson
+    ? 'آپ نے مشق میں وائس میسج بھیج دیا!'
+    : 'مشق میں تصویر کامیابی سے شیئر ہو گئی!'
 
   const confidenceEn =
     incorrect === 0
@@ -100,10 +108,10 @@ export default function ResultsScreen({
                     You completed this practice
                   </h1>
                   <p className="mt-3 max-w-xl text-lg leading-relaxed text-ivory/90">
-                    You shared the photo successfully in practice!
+                    {headlineEn}
                   </p>
                   <p className="mt-2 text-lg text-ivory/80" lang="ur" dir="auto">
-                    مشق میں تصویر کامیابی سے شیئر ہو گئی!
+                    {headlineUr}
                   </p>
                   <p className="mt-4 max-w-xl text-sm leading-relaxed text-ivory/75">
                     This only shows how this practice attempt went on the simulator.
@@ -119,7 +127,12 @@ export default function ResultsScreen({
                   Steps you practised
                 </h2>
                 <ul className="mt-4 space-y-3">
-                  {COMPLETED_STEPS.map((step) => {
+                  {COMPLETED_STEPS.filter((step) =>
+                    (result?.completedSteps?.length
+                      ? result.completedSteps
+                      : COMPLETED_STEPS.map((item) => item.id)
+                    ).includes(step.id),
+                  ).map((step) => {
                     const done = result?.completedSteps?.includes(step.id)
                     return (
                       <li

@@ -21,8 +21,8 @@ export const COMING_SOON_LESSONS = [
     status: 'coming-soon',
   },
   {
-    id: 'send-voice-note',
-    title: 'Send a voice note',
+    id: 'read-news-safely',
+    title: 'Spot a suspicious link',
     description: 'Coming in a later update.',
     status: 'coming-soon',
   },

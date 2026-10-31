@@ -3,19 +3,18 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
-import LessonSimulatorScreen from './screens/LessonSimulatorScreen'
+import PracticeLabScreen from './screens/PracticeLabScreen'
 import FollowAlongScreen from './screens/FollowAlongScreen'
-import {
-  DEFAULT_FOLLOW_ALONG_LESSON_ID,
-} from './data/followAlong'
+import { DEFAULT_FOLLOW_ALONG_LESSON_ID } from './data/followAlong'
+import { LESSON_IDS } from './data/interactiveLessons'
 import { DEFAULT_PROGRESS, normalizeProgress } from './data/progress'
-import { PRACTICE_MODES } from './hooks/useSimulator'
+import { PRACTICE_MODES } from './hooks/usePracticePhone'
 import { useLocalStorage } from './hooks/useLocalStorage'
 
 const VIEWS = {
   welcome: 'welcome',
   dashboard: 'dashboard',
-  simulator: 'simulator',
+  lab: 'lab',
   followAlong: 'follow-along',
 }
 
@@ -31,46 +30,51 @@ export default function App() {
     'digital-ustaad:practice-mode',
     PRACTICE_MODES.guided,
   )
+  const [activeLessonId, setActiveLessonId] = useLocalStorage(
+    'digital-ustaad:active-lesson',
+    LESSON_IDS.sharePhoto,
+  )
   const [followAlongLessonId, setFollowAlongLessonId] = useLocalStorage(
     'digital-ustaad:follow-along-lesson',
     DEFAULT_FOLLOW_ALONG_LESSON_ID,
   )
 
-  const progress = useMemo(
-    () => normalizeProgress(rawProgress),
-    [rawProgress],
-  )
+  const progress = useMemo(() => normalizeProgress(rawProgress), [rawProgress])
 
   useEffect(() => {
     if (migratedProgress.current) return
-
     const needsMigration =
       !rawProgress ||
       typeof rawProgress !== 'object' ||
       Array.isArray(rawProgress) ||
-      rawProgress.version !== 3 ||
+      rawProgress.version !== 4 ||
       Object.prototype.hasOwnProperty.call(rawProgress, 'shareFamilyPhotoCompleted')
 
     migratedProgress.current = true
-    if (needsMigration) {
-      setRawProgress(normalizeProgress(rawProgress))
-    }
+    if (needsMigration) setRawProgress(normalizeProgress(rawProgress))
   }, [rawProgress, setRawProgress])
+
+  // Migrate old simulator view key
+  useEffect(() => {
+    if (view === 'simulator') setView(VIEWS.lab)
+  }, [view, setView])
 
   const goToDashboard = () => setView(VIEWS.dashboard)
   const goToWelcome = () => setView(VIEWS.welcome)
 
-  const startPractice = (mode) => {
+  const startLab = (lessonId, mode) => {
+    setActiveLessonId(lessonId)
     setPracticeMode(mode)
     setRawProgress((prev) => ({
       ...normalizeProgress(prev),
-      shareFamilyPhotoStarted: true,
+      lessonsStarted: true,
+      [`${lessonId}Started`]: true,
     }))
-    setView(VIEWS.simulator)
+    setView(VIEWS.lab)
   }
 
-  const startFollowAlong = (lessonId = DEFAULT_FOLLOW_ALONG_LESSON_ID) => {
-    setFollowAlongLessonId(lessonId)
+  const startFollowAlong = () => {
+    setFollowAlongLessonId(DEFAULT_FOLLOW_ALONG_LESSON_ID)
     setRawProgress((prev) => ({
       ...normalizeProgress(prev),
       followAlongStarted: true,
@@ -78,21 +82,27 @@ export default function App() {
     setView(VIEWS.followAlong)
   }
 
-  const handleGuidedCompleted = () => {
-    setRawProgress((prev) => ({
-      ...normalizeProgress(prev),
-      shareFamilyPhotoStarted: true,
-      guidedCompleted: true,
-    }))
-  }
-
-  const handleIndependentCompleted = (resultSummary) => {
-    setRawProgress((prev) => ({
-      ...normalizeProgress(prev),
-      shareFamilyPhotoStarted: true,
-      independentCompleted: true,
-      latestIndependentResult: resultSummary,
-    }))
+  const handleLabCompleted = (resultSummary) => {
+    const lessonId = resultSummary?.lessonId || activeLessonId
+    setRawProgress((prev) => {
+      const current = normalizeProgress(prev)
+      const key =
+        resultSummary?.mode === PRACTICE_MODES.independent
+          ? 'independentCompletedIds'
+          : 'guidedCompletedIds'
+      const list = current[key].includes(lessonId)
+        ? current[key]
+        : [...current[key], lessonId]
+      return {
+        ...current,
+        lessonsStarted: true,
+        [key]: list,
+        latestResult: resultSummary,
+        ...(resultSummary?.mode === PRACTICE_MODES.independent
+          ? { latestIndependentResult: resultSummary }
+          : {}),
+      }
+    })
   }
 
   const handleFollowAlongCompleted = (lessonId) => {
@@ -101,24 +111,24 @@ export default function App() {
       const ids = current.followAlongCompletedLessonIds.includes(lessonId)
         ? current.followAlongCompletedLessonIds
         : [...current.followAlongCompletedLessonIds, lessonId]
-      return {
-        ...current,
-        followAlongStarted: true,
-        followAlongCompletedLessonIds: ids,
-      }
+      return { ...current, followAlongStarted: true, followAlongCompletedLessonIds: ids }
     })
   }
 
   const handleResetProgress = () => {
     setRawProgress({ ...DEFAULT_PROGRESS })
     setPracticeMode(PRACTICE_MODES.guided)
+    setActiveLessonId(LESSON_IDS.sharePhoto)
     setFollowAlongLessonId(DEFAULT_FOLLOW_ALONG_LESSON_ID)
-    if (view === VIEWS.simulator || view === VIEWS.followAlong) {
-      setView(VIEWS.dashboard)
-    }
+    if (view === VIEWS.lab || view === VIEWS.followAlong) setView(VIEWS.dashboard)
   }
 
-  const safeView = Object.values(VIEWS).includes(view) ? view : VIEWS.welcome
+  const safeView =
+    view === 'simulator'
+      ? VIEWS.lab
+      : Object.values(VIEWS).includes(view)
+        ? view
+        : VIEWS.welcome
   const safeMode = Object.values(PRACTICE_MODES).includes(practiceMode)
     ? practiceMode
     : PRACTICE_MODES.guided
@@ -127,8 +137,8 @@ export default function App() {
     <AnimatePresence mode="wait">
       <motion.div
         key={
-          safeView === VIEWS.simulator
-            ? `${safeView}-${safeMode}`
+          safeView === VIEWS.lab
+            ? `${safeView}-${activeLessonId}-${safeMode}`
             : safeView === VIEWS.followAlong
               ? `${safeView}-${followAlongLessonId}`
               : safeView
@@ -145,17 +155,16 @@ export default function App() {
           <DashboardScreen
             onBack={goToWelcome}
             progress={progress}
-            onStartGuided={() => startPractice(PRACTICE_MODES.guided)}
-            onStartIndependent={() => startPractice(PRACTICE_MODES.independent)}
-            onStartFollowAlong={() => startFollowAlong(DEFAULT_FOLLOW_ALONG_LESSON_ID)}
+            onStartLesson={startLab}
+            onStartFollowAlong={startFollowAlong}
             onResetProgress={handleResetProgress}
           />
-        ) : safeView === VIEWS.simulator ? (
-          <LessonSimulatorScreen
-            onBack={goToDashboard}
+        ) : safeView === VIEWS.lab ? (
+          <PracticeLabScreen
+            lessonId={activeLessonId}
             mode={safeMode}
-            onGuidedCompleted={handleGuidedCompleted}
-            onIndependentCompleted={handleIndependentCompleted}
+            onBack={goToDashboard}
+            onCompleted={handleLabCompleted}
           />
         ) : safeView === VIEWS.followAlong ? (
           <FollowAlongScreen
