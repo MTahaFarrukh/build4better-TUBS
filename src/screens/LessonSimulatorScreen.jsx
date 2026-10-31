@@ -18,7 +18,7 @@ export default function LessonSimulatorScreen({
   const simulator = useSimulator(mode)
   const { state, reset, exitGuided, setGuidedStep, clearHint } = simulator
   const completionSent = useRef(false)
-  const [showIndependentResults, setShowIndependentResults] = useState(false)
+  const [showResults, setShowResults] = useState(false)
   const isIndependent = mode === PRACTICE_MODES.independent
 
   useEffect(() => {
@@ -27,14 +27,14 @@ export default function LessonSimulatorScreen({
     }
 
     completionSent.current = true
+    setShowResults(true)
 
     if (isIndependent) {
       onIndependentCompleted?.(state.resultSummary)
-      setShowIndependentResults(true)
       return
     }
 
-    onGuidedCompleted?.()
+    onGuidedCompleted?.(state.resultSummary)
   }, [
     state.shareConfirmed,
     state.resultSummary,
@@ -45,19 +45,16 @@ export default function LessonSimulatorScreen({
 
   const handleReset = () => {
     completionSent.current = false
-    setShowIndependentResults(false)
+    setShowResults(false)
     reset(mode)
   }
 
-  const handlePracticeAgain = () => {
-    handleReset()
-  }
-
-  if (isIndependent && showIndependentResults && state.resultSummary) {
+  if (showResults && state.resultSummary) {
     return (
       <ResultsScreen
         result={state.resultSummary}
-        onPracticeAgain={handlePracticeAgain}
+        mode={mode}
+        onPracticeAgain={handleReset}
         onBackToDashboard={onBack}
       />
     )
@@ -70,18 +67,18 @@ export default function LessonSimulatorScreen({
           <button
             type="button"
             onClick={onBack}
-            className="mb-4 inline-flex items-center gap-2 rounded-xl text-sm font-medium text-forest-muted transition-colors hover:text-forest"
+            className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
             Back to dashboard
           </button>
 
           <div className="mb-3 flex flex-wrap items-center gap-3">
             <PracticeBadge />
-            <span className="rounded-full bg-sage px-3 py-1.5 text-xs font-semibold tracking-wide text-forest uppercase">
+            <span className="rounded-full bg-sage px-3 py-1.5 text-sm font-semibold text-forest">
               {isIndependent ? 'Independent practice' : 'Guided practice'}
             </span>
-            <span className="rounded-full bg-teal-soft px-3 py-1.5 text-xs font-semibold tracking-wide text-forest uppercase">
+            <span className="rounded-full bg-teal-soft px-3 py-1.5 text-sm font-semibold text-forest">
               {FLAGSHIP_LESSON.title}
             </span>
           </div>
@@ -89,12 +86,12 @@ export default function LessonSimulatorScreen({
           <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
             {isIndependent ? 'Try it on your own' : 'Practice on a safe phone'}
           </h1>
-          <p className="mt-2 text-base leading-relaxed text-ink/80 sm:text-lg">
+          <p className="mt-2 text-lg leading-relaxed text-ink/80">
             {isIndependent
               ? 'Open Gallery, choose a photo, share it with a practice contact, then confirm. No step-by-step guide this time.'
-              : 'Follow the guide, or explore freely. Nothing leaves this practice phone — no real photos, contacts, or messages.'}
+              : 'Follow the simple steps. Nothing leaves this practice phone — no real photos, contacts, or messages.'}
           </p>
-          <p className="mt-2 text-base text-forest-muted" lang="ur" dir="auto">
+          <p className="mt-2 text-lg text-forest-muted" lang="ur" dir="auto">
             {isIndependent
               ? 'یہ محفوظ مشق ہے — حقیقی پیغام نہیں جائے گا۔'
               : 'یہ محفوظ مشق والا فون ہے — حقیقی تصویر، رابطہ یا پیغام استعمال نہیں ہوتے۔'}
@@ -104,13 +101,14 @@ export default function LessonSimulatorScreen({
         <div className="flex flex-wrap gap-3">
           <Button variant="secondary" onClick={handleReset} className="px-4">
             <RotateCcw className="h-5 w-5" aria-hidden="true" />
-            Reset lesson
+            Reset this attempt
           </Button>
           {!isIndependent && !state.guidedEnabled && !state.guidedComplete && (
             <Button
               variant="ghost"
               onClick={() => {
                 completionSent.current = false
+                setShowResults(false)
                 reset(PRACTICE_MODES.guided)
               }}
               className="px-4"
@@ -145,51 +143,33 @@ export default function LessonSimulatorScreen({
                 role="status"
                 aria-live="polite"
               >
-                <p className="text-sm font-semibold text-forest">Gentle hint</p>
-                <p className="mt-1 text-sm text-ink">{state.hint.en}</p>
-                <p className="mt-1 text-sm text-forest" lang="ur" dir="auto">
+                <p className="text-base font-semibold text-forest">Gentle tip</p>
+                <p className="mt-1 text-base text-ink">{state.hint.en}</p>
+                <p className="mt-1 text-base text-forest" lang="ur" dir="auto">
                   {state.hint.ur}
                 </p>
                 <button
                   type="button"
                   onClick={clearHint}
-                  className="mt-3 text-sm font-medium text-teal underline-offset-2 hover:underline"
+                  className="touch-target mt-3 inline-flex items-center rounded-xl text-base font-medium text-teal underline-offset-2 hover:underline"
                 >
-                  Dismiss
+                  Dismiss tip
                 </button>
-              </div>
-            )}
-
-            {state.guidedComplete && (
-              <div className="mt-4 rounded-[var(--radius-card)] bg-sage p-5 shadow-soft">
-                <p className="font-display text-xl font-semibold text-forest">
-                  Well done
-                </p>
-                <p className="mt-2 text-base leading-relaxed text-ink/80">
-                  You practised sharing a family photo. Try Independent Practice next, or return to the dashboard.
-                </p>
-                <p className="mt-1 text-sm text-forest-muted" lang="ur" dir="auto">
-                  بہت خوب — اب Independent Practice بھی آزما سکتے ہیں۔
-                </p>
               </div>
             )}
           </div>
         )}
 
         <div className={isIndependent ? '' : 'order-1 xl:order-2'}>
-          {isIndependent && (
-            <div className="mb-4 rounded-[var(--radius-card)] bg-sage/80 px-4 py-3 text-sm text-forest shadow-soft">
-              <p>
-                Safe practice environment — nothing will actually be sent.
-              </p>
-              <p className="mt-1" lang="ur" dir="auto">
-                محفوظ مشق — کچھ بھی واقعی نہیں بھیجا جائے گا۔
-              </p>
-            </div>
-          )}
+          <div className="mb-4 rounded-[var(--radius-card)] bg-sage/80 px-4 py-3 text-base text-forest shadow-soft">
+            <p>Safe practice only — nothing will actually be sent.</p>
+            <p className="mt-1" lang="ur" dir="auto">
+              محفوظ مشق — کچھ بھی واقعی نہیں بھیجا جائے گا۔
+            </p>
+          </div>
           <PhoneWorkspace
             simulator={simulator}
-            hideInPhoneSuccess={isIndependent}
+            hideInPhoneSuccess
           />
         </div>
       </div>

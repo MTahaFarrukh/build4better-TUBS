@@ -61,9 +61,9 @@ export default function WelcomeScreen({ onStart }) {
               Start learning
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Button>
-            <p className="flex items-center gap-2 text-sm text-forest-muted sm:pl-2">
-              <ShieldCheck className="h-4 w-4 text-teal" aria-hidden="true" />
-              No account. Practice stays on this device.
+            <p className="flex items-center gap-2 text-base text-forest-muted sm:pl-2">
+              <ShieldCheck className="h-5 w-5 shrink-0 text-teal" aria-hidden="true" />
+              No account needed. Practice stays on this device.
             </p>
           </motion.div>
         </div>

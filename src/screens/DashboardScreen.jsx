@@ -32,7 +32,7 @@ export default function DashboardScreen({
 
   const handleResetProgress = () => {
     const confirmed = window.confirm(
-      'Reset saved practice progress on this device? This does not affect Guided or Independent lesson content.',
+      'Clear the practice progress saved on this device?\n\nYou can still open Guided and Independent practice afterwards.',
     )
     if (confirmed) onResetProgress?.()
   }
@@ -44,18 +44,18 @@ export default function DashboardScreen({
           <button
             type="button"
             onClick={onBack}
-            className="mb-4 inline-flex items-center gap-2 rounded-xl text-sm font-medium text-forest-muted transition-colors hover:text-forest"
+            className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
             Back to welcome
           </button>
           <h1 className="font-display text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
             Your learning space
           </h1>
-          <p className="mt-2 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
+          <p className="mt-2 max-w-2xl text-lg leading-relaxed text-ink/80">
             Learn with guidance first, then try Independent Practice on the same safe phone.
           </p>
-          <p className="mt-1 text-base text-forest-muted" lang="ur" dir="auto">
+          <p className="mt-1 text-lg text-forest-muted" lang="ur" dir="auto">
             پہلے رہنمائی کے ساتھ سیکھیں، پھر خود مشق کریں۔
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function DashboardScreen({
                     <Compass className="h-5 w-5" aria-hidden="true" />
                     Independent Practice
                   </Button>
-                  <p className="text-sm text-forest-muted">
+                  <p className="text-base text-forest-muted">
                     Guided mode shows Urdu + English steps. Independent mode hides the guide so you can practise freely. Nothing real is sent.
                   </p>
                 </div>
@@ -139,14 +139,17 @@ export default function DashboardScreen({
         >
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-forest">Your progress</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink/75">
+            <p className="mt-2 text-base leading-relaxed text-ink/75">
               {progress.independentCompleted
-                ? 'You completed Independent Practice. You can replay either mode anytime.'
+                ? 'You finished Independent Practice on this device. You can practise again anytime.'
                 : progress.guidedCompleted
-                  ? 'Guided practice is done. Try Independent Practice when you feel ready.'
+                  ? 'Guided practice is saved. Try Independent Practice when you feel ready.'
                   : progress.shareFamilyPhotoStarted
                     ? 'You started the photo-sharing lesson. Continue whenever you like.'
-                    : 'No lessons completed yet. Start with Guided Practice.'}
+                    : 'No practice saved yet. Start with Guided Practice.'}
+            </p>
+            <p className="mt-2 text-sm text-forest-muted">
+              Progress here only tracks practice on this device — not real-world phone skill.
             </p>
             <div className="mt-5 h-3 overflow-hidden rounded-full bg-sage">
               <div
@@ -155,16 +158,16 @@ export default function DashboardScreen({
                 aria-hidden="true"
               />
             </div>
-            <p className="mt-2 text-xs font-medium tracking-wide text-forest-muted uppercase">
-              {progressPercent}% — {progressLabel}
+            <p className="mt-2 text-sm font-medium text-forest-muted">
+              Practice progress: {progressPercent}% — {progressLabel}
             </p>
 
             <button
               type="button"
               onClick={handleResetProgress}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl text-sm font-medium text-forest-muted transition-colors hover:text-forest"
+              className="touch-target mt-5 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
             >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              <RotateCcw className="h-5 w-5" aria-hidden="true" />
               Reset saved progress
             </button>
           </Card>
@@ -172,19 +175,22 @@ export default function DashboardScreen({
           {latest?.completed && (
             <Card className="p-6">
               <h2 className="font-display text-xl font-semibold text-forest">
-                Latest independent result
+                Latest independent practice attempt
               </h2>
-              <ul className="mt-4 space-y-2 text-sm text-ink/85">
-                <li>Successful taps: {latest.successfulActions}</li>
+              <p className="mt-2 text-sm text-forest-muted">
+                Notes from your last Independent Practice try on this device.
+              </p>
+              <ul className="mt-4 space-y-2 text-base text-ink/85">
+                <li>Helpful taps: {latest.successfulActions}</li>
                 <li>Extra tries: {latest.incorrectAttempts}</li>
-                <li>Time: {latestDuration ?? 'Not recorded'}</li>
+                <li>Time on that attempt: {latestDuration ?? 'Not recorded'}</li>
                 <li>
                   {latest.completedWithoutAssistance
-                    ? 'Finished without guided help'
+                    ? 'Finished without the step-by-step guide'
                     : 'Completed with assistance'}
                 </li>
               </ul>
-              <p className="mt-3 text-sm text-forest-muted" lang="ur" dir="auto">
+              <p className="mt-3 text-base text-forest-muted" lang="ur" dir="auto">
                 آخری خود مشق کا نتیجہ اسی آلے پر محفوظ ہے۔
               </p>
             </Card>

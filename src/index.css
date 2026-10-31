@@ -55,6 +55,21 @@
     outline: 3px solid var(--color-teal);
     outline-offset: 3px;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -71,7 +86,7 @@
   }
 
   .touch-target {
-    min-height: 3.25rem;
-    min-width: 3.25rem;
+    min-height: 3rem;
+    min-width: 3rem;
   }
 }

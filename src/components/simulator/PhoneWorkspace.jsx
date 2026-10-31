@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { getContactById, getPhotoById } from '../../data/gallery'
 import { APPS, PRACTICE_MODES } from '../../hooks/useSimulator'
 import GalleryGrid from './GalleryGrid'
@@ -9,6 +9,7 @@ import ShareSheet from './ShareSheet'
 import SuccessScreen from './SuccessScreen'
 
 export default function PhoneWorkspace({ simulator, hideInPhoneSuccess = false }) {
+  const reduceMotion = useReducedMotion()
   const {
     state,
     openGallery,
@@ -26,6 +27,9 @@ export default function PhoneWorkspace({ simulator, hideInPhoneSuccess = false }
   const photo = getPhotoById(state.selectedPhotoId)
   const recipient = getContactById(state.selectedRecipientId)
   const showSuccess = state.app === APPS.success && !hideInPhoneSuccess
+  const screenTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.22 }
 
   const handleWrongApp = (label) => {
     if (state.mode === PRACTICE_MODES.independent) {
@@ -54,10 +58,10 @@ export default function PhoneWorkspace({ simulator, hideInPhoneSuccess = false }
           <motion.div
             key={state.app === APPS.share ? APPS.preview : state.app}
             className="absolute inset-0"
-            initial={{ opacity: 0, x: 12 }}
+            initial={reduceMotion ? false : { opacity: 0, x: 12 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -12 }}
-            transition={{ duration: 0.22 }}
+            exit={reduceMotion ? undefined : { opacity: 0, x: -12 }}
+            transition={screenTransition}
           >
             {state.app === APPS.home && (
               <HomeScreen

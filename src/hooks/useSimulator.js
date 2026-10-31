@@ -189,6 +189,7 @@ function reducer(state, action) {
         maxReachedStep: TOTAL_GUIDED_STEPS,
         resultSummary: {
           completed: true,
+          mode: state.mode,
           incorrectAttempts: state.incorrectAttempts,
           successfulActions: successPatch.successfulActions,
           durationMs:

@@ -5,6 +5,7 @@ import PracticeBadge from '../components/simulator/PracticeBadge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { COMPLETED_STEPS, formatDuration } from '../data/progress'
+import { PRACTICE_MODES } from '../hooks/useSimulator'
 
 function ConfettiBurst({ enabled }) {
   if (!enabled) return null
@@ -33,25 +34,31 @@ function ConfettiBurst({ enabled }) {
   )
 }
 
-export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboard }) {
+export default function ResultsScreen({
+  result,
+  mode = PRACTICE_MODES.independent,
+  onPracticeAgain,
+  onBackToDashboard,
+}) {
   const reduceMotion = useReducedMotion()
   const durationLabel = formatDuration(result?.durationMs)
   const incorrect = result?.incorrectAttempts ?? 0
   const successful = result?.successfulActions ?? 0
+  const isIndependent = mode === PRACTICE_MODES.independent
 
   const confidenceEn =
     incorrect === 0
-      ? "You're getting more confident!"
+      ? "You're getting more comfortable with this practice."
       : incorrect <= 2
-        ? 'Nice work — practice is making this easier.'
-        : 'You finished it. Every try builds confidence.'
+        ? 'Nice work — each practice attempt helps.'
+        : 'You finished the practice. Taking your time is perfectly fine.'
 
   const confidenceUr =
     incorrect === 0
-      ? 'آپ زیادہ پراعتماد ہو رہے ہیں!'
+      ? 'اس مشق میں آپ زیادہ آرام سے محسوس کر رہے ہیں۔'
       : incorrect <= 2
-        ? 'اچھا کیا — مشق سے آسان ہوتا جا رہا ہے۔'
-        : 'آپ نے مکمل کر لیا۔ ہر کوشش اعتماد بڑھاتی ہے۔'
+        ? 'اچھا کیا — ہر مشق مددگار ہوتی ہے۔'
+        : 'آپ نے مشق مکمل کر لی۔ آہستہ کرنا بالکل ٹھیک ہے۔'
 
   return (
     <AppShell onBrandClick={onBackToDashboard}>
@@ -61,23 +68,23 @@ export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboa
         <button
           type="button"
           onClick={onBackToDashboard}
-          className="mb-4 inline-flex items-center gap-2 rounded-xl text-sm font-medium text-forest-muted transition-colors hover:text-forest"
+          className="touch-target mb-4 inline-flex items-center gap-2 rounded-xl px-2 text-base font-medium text-forest-muted transition-colors hover:text-forest"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           Back to dashboard
         </button>
 
         <div className="mb-5 flex flex-wrap items-center gap-3">
           <PracticeBadge />
-          <span className="rounded-full bg-sage px-3 py-1.5 text-xs font-semibold tracking-wide text-forest uppercase">
-            Independent practice result
+          <span className="rounded-full bg-sage px-3 py-1.5 text-sm font-semibold text-forest">
+            {isIndependent ? 'Independent practice result' : 'Guided practice result'}
           </span>
         </div>
 
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
+          transition={{ duration: reduceMotion ? 0 : 0.45 }}
         >
           <Card className="overflow-hidden p-0">
             <div className="bg-gradient-to-br from-forest via-forest-muted to-teal px-6 py-8 text-ivory sm:px-8">
@@ -90,13 +97,17 @@ export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboa
                     Well done
                   </p>
                   <h1 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
-                    Mashallah — you did it!
+                    You completed this practice
                   </h1>
-                  <p className="mt-3 max-w-xl text-base leading-relaxed text-ivory/90 sm:text-lg">
+                  <p className="mt-3 max-w-xl text-lg leading-relaxed text-ivory/90">
                     You shared the photo successfully in practice!
                   </p>
-                  <p className="mt-2 text-base text-ivory/80" lang="ur" dir="auto">
+                  <p className="mt-2 text-lg text-ivory/80" lang="ur" dir="auto">
                     مشق میں تصویر کامیابی سے شیئر ہو گئی!
+                  </p>
+                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-ivory/75">
+                    This only shows how this practice attempt went on the simulator.
+                    It does not measure real-world phone skills.
                   </p>
                 </div>
               </div>
@@ -104,8 +115,8 @@ export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboa
 
             <div className="space-y-6 p-6 sm:p-8">
               <div>
-                <h2 className="font-display text-xl font-semibold text-forest">
-                  What you completed
+                <h2 className="font-display text-2xl font-semibold text-forest">
+                  Steps you practised
                 </h2>
                 <ul className="mt-4 space-y-3">
                   {COMPLETED_STEPS.map((step) => {
@@ -120,8 +131,8 @@ export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboa
                           aria-hidden="true"
                         />
                         <div>
-                          <p className="font-medium text-forest">{step.labelEn}</p>
-                          <p className="text-sm text-forest-muted" lang="ur" dir="auto">
+                          <p className="text-base font-medium text-forest">{step.labelEn}</p>
+                          <p className="text-base text-forest-muted" lang="ur" dir="auto">
                             {step.labelUr}
                           </p>
                         </div>
@@ -131,46 +142,54 @@ export default function ResultsScreen({ result, onPracticeAgain, onBackToDashboa
                 </ul>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
-                  <p className="text-xs font-semibold tracking-wide text-forest-muted uppercase">
-                    Successful taps
-                  </p>
-                  <p className="mt-2 text-3xl font-semibold text-forest">{successful}</p>
-                </div>
-                <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
-                  <p className="text-xs font-semibold tracking-wide text-forest-muted uppercase">
-                    Extra tries
-                  </p>
-                  <p className="mt-2 text-3xl font-semibold text-forest">{incorrect}</p>
-                  <p className="mt-1 text-sm text-forest-muted">
-                    {incorrect === 0 ? 'No mistaken taps' : 'Normal while learning'}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
-                  <p className="text-xs font-semibold tracking-wide text-forest-muted uppercase">
-                    Time taken
-                  </p>
-                  <p className="mt-2 flex items-center gap-2 text-2xl font-semibold text-forest">
-                    <Clock3 className="h-5 w-5 text-teal" aria-hidden="true" />
-                    {durationLabel ?? 'Not recorded'}
-                  </p>
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-forest">
+                  This practice attempt
+                </h2>
+                <p className="mt-2 text-base text-forest-muted">
+                  Simple notes from this try only — not a grade or score.
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
+                    <p className="text-sm font-semibold text-forest-muted">
+                      Helpful taps
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-forest">{successful}</p>
+                  </div>
+                  <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
+                    <p className="text-sm font-semibold text-forest-muted">
+                      Extra tries
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-forest">{incorrect}</p>
+                    <p className="mt-1 text-sm text-forest-muted">
+                      {incorrect === 0 ? 'No extra taps needed' : 'Extra tries are normal'}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-ivory px-4 py-4 shadow-soft ring-1 ring-forest/5">
+                    <p className="text-sm font-semibold text-forest-muted">
+                      Time on this attempt
+                    </p>
+                    <p className="mt-2 flex items-center gap-2 text-2xl font-semibold text-forest">
+                      <Clock3 className="h-5 w-5 text-teal" aria-hidden="true" />
+                      {durationLabel ?? 'Not recorded'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               <div className="rounded-2xl bg-teal-soft/80 px-5 py-4">
-                <p className="inline-flex items-center gap-2 text-base font-semibold text-forest">
+                <p className="inline-flex items-center gap-2 text-lg font-semibold text-forest">
                   <Sparkles className="h-5 w-5 text-teal" aria-hidden="true" />
                   {confidenceEn}
                 </p>
-                <p className="mt-1 text-base text-forest" lang="ur" dir="auto">
+                <p className="mt-1 text-lg text-forest" lang="ur" dir="auto">
                   {confidenceUr}
                 </p>
-                {result?.completedWithoutAssistance && (
-                  <p className="mt-3 text-sm text-forest-muted">
-                    Completed without guided help — practice only, nothing was sent.
-                  </p>
-                )}
+                <p className="mt-3 text-base text-forest-muted">
+                  {isIndependent
+                    ? 'You finished this practice without the step-by-step guide. Nothing was sent outside this practice phone.'
+                    : 'You finished with guided help available. Nothing was sent outside this practice phone.'}
+                </p>
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">

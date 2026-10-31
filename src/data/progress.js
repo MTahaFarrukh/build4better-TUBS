@@ -20,8 +20,11 @@ function sanitizeResult(raw) {
   const successfulActions = Number(raw.successfulActions)
   const durationMs = Number(raw.durationMs)
 
+  const mode = raw.mode === 'guided' || raw.mode === 'independent' ? raw.mode : null
+
   return {
     completed: Boolean(raw.completed),
+    mode,
     incorrectAttempts: Number.isFinite(incorrectAttempts) ? Math.max(0, incorrectAttempts) : 0,
     successfulActions: Number.isFinite(successfulActions) ? Math.max(0, successfulActions) : 0,
     durationMs: Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : null,

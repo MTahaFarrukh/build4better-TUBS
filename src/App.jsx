@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useMemo, useRef } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
@@ -15,6 +15,8 @@ const VIEWS = {
 }
 
 export default function App() {
+  const reduceMotion = useReducedMotion()
+  const migratedProgress = useRef(false)
   const [view, setView] = useLocalStorage('digital-ustaad:view', VIEWS.welcome)
   const [rawProgress, setRawProgress] = useLocalStorage(
     'digital-ustaad:progress',
@@ -30,42 +32,49 @@ export default function App() {
     [rawProgress],
   )
 
+  useEffect(() => {
+    if (migratedProgress.current) return
+
+    const needsMigration =
+      !rawProgress ||
+      typeof rawProgress !== 'object' ||
+      Array.isArray(rawProgress) ||
+      rawProgress.version !== 2 ||
+      Object.prototype.hasOwnProperty.call(rawProgress, 'shareFamilyPhotoCompleted')
+
+    migratedProgress.current = true
+    if (needsMigration) {
+      setRawProgress(normalizeProgress(rawProgress))
+    }
+  }, [rawProgress, setRawProgress])
+
   const goToDashboard = () => setView(VIEWS.dashboard)
   const goToWelcome = () => setView(VIEWS.welcome)
 
   const startPractice = (mode) => {
     setPracticeMode(mode)
-    setRawProgress((prev) => {
-      const current = normalizeProgress(prev)
-      return {
-        ...current,
-        shareFamilyPhotoStarted: true,
-      }
-    })
+    setRawProgress((prev) => ({
+      ...normalizeProgress(prev),
+      shareFamilyPhotoStarted: true,
+    }))
     setView(VIEWS.simulator)
   }
 
   const handleGuidedCompleted = () => {
-    setRawProgress((prev) => {
-      const current = normalizeProgress(prev)
-      return {
-        ...current,
-        shareFamilyPhotoStarted: true,
-        guidedCompleted: true,
-      }
-    })
+    setRawProgress((prev) => ({
+      ...normalizeProgress(prev),
+      shareFamilyPhotoStarted: true,
+      guidedCompleted: true,
+    }))
   }
 
   const handleIndependentCompleted = (resultSummary) => {
-    setRawProgress((prev) => {
-      const current = normalizeProgress(prev)
-      return {
-        ...current,
-        shareFamilyPhotoStarted: true,
-        independentCompleted: true,
-        latestIndependentResult: resultSummary,
-      }
-    })
+    setRawProgress((prev) => ({
+      ...normalizeProgress(prev),
+      shareFamilyPhotoStarted: true,
+      independentCompleted: true,
+      latestIndependentResult: resultSummary,
+    }))
   }
 
   const handleResetProgress = () => {
@@ -85,10 +94,10 @@ export default function App() {
     <AnimatePresence mode="wait">
       <motion.div
         key={safeView === VIEWS.simulator ? `${safeView}-${safeMode}` : safeView}
-        initial={{ opacity: 0 }}
+        initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
+        exit={reduceMotion ? undefined : { opacity: 0 }}
+        transition={{ duration: reduceMotion ? 0 : 0.25 }}
         className="min-h-screen"
       >
         {safeView === VIEWS.welcome ? (

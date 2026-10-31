@@ -39,9 +39,9 @@ export default function GuidedOverlay({
             type="button"
             onClick={onExit}
             className="touch-target inline-flex items-center justify-center rounded-xl text-forest-muted hover:text-forest"
-            aria-label="Exit guided tutorial"
+            aria-label="Exit guided steps"
           >
-            <X className="h-5 w-5" aria-hidden="true" />
+            <X className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
 

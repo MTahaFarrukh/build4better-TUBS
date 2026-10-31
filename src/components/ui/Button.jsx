@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 const variants = {
   primary:
@@ -16,12 +16,14 @@ export default function Button({
   type = 'button',
   ...props
 }) {
+  const reduceMotion = useReducedMotion()
+
   return (
     <motion.button
       type={type}
-      whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
-      className={`touch-target inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-base font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
+      whileHover={reduceMotion ? undefined : { y: -1 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+      className={`touch-target inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-base font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
