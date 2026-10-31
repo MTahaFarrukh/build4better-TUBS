@@ -49,10 +49,10 @@ export default function HomeScreen({
   }
 
   return (
-    <div className="flex h-full flex-col bg-gradient-to-b from-sage via-ivory to-teal-soft px-5 pt-6 pb-4">
+    <div className="flex h-full flex-col bg-[#e5edf8] px-5 pt-6 pb-4">
       <div className="mb-8 pt-4 text-center">
         <p className="text-5xl font-light tracking-tight text-forest">10:10</p>
-        <p className="mt-2 text-base text-forest-muted">A little practice, every day</p>
+        <p className="mt-2 text-base text-forest-muted">Your everyday essentials</p>
         <p className="mt-1 text-sm text-forest-muted" lang="ur" dir="rtl">ہر روز تھوڑی سی مشق</p>
       </div>
 

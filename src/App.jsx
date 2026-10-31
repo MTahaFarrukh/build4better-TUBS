@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
+import ScamScreen from './screens/ScamScreen'
 import WelcomeScreen from './screens/WelcomeScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import PracticeLabScreen from './screens/PracticeLabScreen'
@@ -97,6 +98,7 @@ export default function App() {
         ...current,
         lessonsStarted: true,
         [key]: list,
+        masteredIds: resultSummary?.mode === 'independent' && resultSummary.completedWithoutAssistance && resultSummary.incorrectAttempts === 0 ? [...new Set([...(current.masteredIds || []), lessonId])] : (current.masteredIds || []),
         latestResult: resultSummary,
         ...(resultSummary?.mode === PRACTICE_MODES.independent
           ? { latestIndependentResult: resultSummary }
@@ -160,11 +162,12 @@ export default function App() {
             onResetProgress={handleResetProgress}
           />
         ) : safeView === VIEWS.lab ? (
-          <PracticeLabScreen
+          activeLessonId === 'scam-safety' ? <ScamScreen mode={safeMode} onBack={goToDashboard} onCompleted={handleLabCompleted}/> : <PracticeLabScreen
             lessonId={activeLessonId}
             mode={safeMode}
             onBack={goToDashboard}
             onCompleted={handleLabCompleted}
+            onIndependent={() => startLab(activeLessonId, PRACTICE_MODES.independent)}
           />
         ) : safeView === VIEWS.followAlong ? (
           <FollowAlongScreen

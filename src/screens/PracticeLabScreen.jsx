@@ -6,11 +6,12 @@ import { useSpeechCoach } from '../hooks/useSpeechCoach'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import ResultsScreen from './ResultsScreen'
 
-export default function PracticeLabScreen({ lessonId, mode = PRACTICE_MODES.guided, onBack, onCompleted }) {
+export default function PracticeLabScreen({ lessonId, mode = PRACTICE_MODES.guided, onBack, onCompleted, onIndependent }) {
   const phone = usePracticePhone(lessonId, mode)
   const { state, lesson } = phone
   const { supported, speaking, speak, stop } = useSpeechCoach()
   const [language, setLanguage] = useLocalStorage('digital-ustaad:language', 'en')
+  const [minimized, setMinimized] = useState(false)
   const [paused, setPaused] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const completionSent = useRef(false)
@@ -46,7 +47,7 @@ export default function PracticeLabScreen({ lessonId, mode = PRACTICE_MODES.guid
         <button className="lab-action" onClick={() => { stop(); setLanguage(ur ? 'en' : 'ur') }} aria-label="Change instruction language">{ur ? 'English' : 'اردو'}</button>
       </header>
       <div className="practice-layout">
-        <section className="practice-context" aria-label="Lesson instructions">
+        <section className={`practice-context ${minimized ? 'coach-minimized' : ''}`} aria-label="Lesson instructions">
           <div className="flex items-center justify-between gap-2 text-sm text-forest-muted">
             <span>{independent ? (ur ? 'خود مشق کریں' : 'Try it yourself') : (ur ? 'قدم بہ قدم' : 'Step by step')}</span>
             <span>{Math.min(completed, lesson?.steps.length ?? 1)} / {lesson?.steps.length}</span>
@@ -54,6 +55,7 @@ export default function PracticeLabScreen({ lessonId, mode = PRACTICE_MODES.guid
           <div className="lesson-progress" role="progressbar" aria-label="Lesson progress" aria-valuemin={0} aria-valuemax={lesson?.steps.length} aria-valuenow={Math.min(completed, lesson?.steps.length ?? 1)}>
             {lesson?.steps.map((item, i) => <span key={item.id} className={i < completed ? 'done' : ''} />)}
           </div>
+          <button className="coach-toggle" onClick={() => setMinimized(!minimized)}>{minimized ? (ur ? 'استاد کی مدد کھولیں' : 'Open Ustaad coach') : (ur ? 'مدد سمیٹیں' : 'Minimize coach')}</button>
           <h1 className="mt-3 text-xl font-semibold leading-relaxed text-forest" lang={language} dir={ur ? 'rtl' : 'ltr'} aria-live="polite">{state.resultSummary ? (ur ? 'بہت خوب! مشق مکمل ہوئی۔' : 'Well done! You did it.') : instruction}</h1>
           <div className="mt-3 flex flex-wrap gap-2">
             {!state.resultSummary && <button className="lab-action" onClick={phone.showHelp}><HelpCircle size={19} />{ur ? 'مدد لیں' : 'Help me'}</button>}
@@ -70,6 +72,7 @@ export default function PracticeLabScreen({ lessonId, mode = PRACTICE_MODES.guid
             <button className="lab-action mt-1" onClick={phone.clearHint}>{ur ? 'ٹھیک ہے' : 'Got it'}</button>
           </div>}
           {state.incorrectAttempts >= 2 && !state.hint && !state.resultSummary && <p className="mt-2 text-sm text-forest-muted">{ur ? 'جلدی نہیں۔ مدد کسی بھی وقت لے سکتے ہیں۔' : 'Take your time. Help is here whenever you need it.'}</p>}
+          {state.resultSummary && !independent && <button className="lab-primary mt-4" onClick={onIndependent}>{ur ? 'اب خود کوشش کریں' : 'Now try it yourself'} →</button>}
           {state.resultSummary && <button className="lab-primary mt-4" onClick={() => setShowResults(true)}>{ur ? 'اپنی پیش رفت دیکھیں' : 'See my progress'} →</button>}
           <p className="practice-safety">{ur ? 'محفوظ مشق • کوئی اصلی پیغام یا ریکارڈنگ نہیں' : 'Safe practice • No real messages or audio recorded'}</p>
         </section>

@@ -1,5 +1,6 @@
 export const DEFAULT_PROGRESS = {
   version: 4,
+  masteredIds: [],
   lessonsStarted: false,
   guidedCompletedIds: [],
   independentCompletedIds: [],
@@ -79,6 +80,7 @@ export function normalizeProgress(raw) {
 
   return {
     version: 4,
+    masteredIds: sanitizeIds(raw.masteredIds),
     lessonsStarted,
     guidedCompletedIds,
     independentCompletedIds,

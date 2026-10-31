@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-pwa.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync",
     "cap:sync:android": "npm run build && npx cap sync android",
     "cap:open:android": "npx cap open android",
-    "android:sync": "npm run cap:sync:android"
+    "android:sync": "npm run cap:sync:android",
+    "test": "node tests/state.mjs && node tests/scam-pwa.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
