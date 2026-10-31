@@ -187,13 +187,7 @@ Suggested arc: Welcome → learning path → photo share → voice/reply → saf
 
 ## Submitted commit
 
-Update after this push:
-
-```bash
-git rev-parse HEAD
-```
-
-Paste the full SHA into the submission form.
+`59a697e` — run `git rev-parse HEAD` after any later push and update this line if needed.
 
 ---
 
